@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Football Career Sim</title>
+    <title>Football Career Sim Beta</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -449,7 +449,7 @@
         <div class="input-grid">
             <div class="input-group">
                 <label>Name</label>
-                <input type="text" id="input-name" placeholder="e.g. Kylian Mbappé" value="Wonderkid">
+                <input type="text" id="input-name" placeholder="e.g. Kylian Mbappé" value="">
             </div>
             <div class="input-group">
                 <label>Foot</label>
@@ -897,7 +897,7 @@
     // --- CORE FUNCTIONS ---
     function startGame() {
         const nameInput = document.getElementById('input-name').value.trim();
-        player.name = nameInput || "Wonderkid";
+        player.name = nameInput || "";
         player.pos = document.getElementById('input-pos').value;
         player.foot = document.getElementById('input-foot').value;
         player.region = document.getElementById('input-region').value;
