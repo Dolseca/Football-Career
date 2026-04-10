@@ -82,7 +82,8 @@
 
         #game-container {
             width: 100%;
-            max-width: 1200px;
+            /* INCREASED WIDTH HERE */
+            max-width: 1600px; 
             background: var(--glass-surface);
             backdrop-filter: blur(50px) saturate(180%);
             -webkit-backdrop-filter: blur(50px) saturate(180%);
@@ -224,6 +225,7 @@
             display: none;
             padding: 25px;
             display: grid;
+            /* Wider layout support */
             grid-template-columns: 3fr 1fr;
             gap: 20px;
             flex-grow: 1;
@@ -344,47 +346,63 @@
         .changelog-list li { margin-bottom: 6px; padding-left: 18px; position: relative; color: var(--text-muted); font-size: 0.9rem; }
         .changelog-list li::before { content: "•"; color: var(--success); position: absolute; left: 0; font-weight: bold; }
 
-        /* --- MOBILE OPTIMIZATION --- */
+        /* --- MOBILE OPTIMIZATION (FIXED) --- */
         @media (max-width: 900px) {
-            body { padding: 10px; }
-            #game-container { border-radius: 24px; min-height: 98vh; }
-            .top-bar { padding: 15px 20px; }
-            .brand { font-size: 1.2rem; }
+            body { padding: 0; } /* Remove body padding on mobile to maximize space */
+            
+            #game-container { 
+                border-radius: 0; 
+                min-height: 100vh; 
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .top-bar { padding: 15px; }
+            .brand { font-size: 1.1rem; }
             
             #dashboard { 
-                grid-template-columns: 1fr; 
+                display: flex !important; /* Switch to flex for easier stacking */
+                flex-direction: column;
                 padding: 15px; 
                 gap: 15px;
+                width: 100%;
             }
             
             .player-card { 
                 flex-direction: column; 
                 text-align: center; 
-                padding: 20px;
+                padding: 15px;
                 gap: 15px;
+                width: 100%;
             }
             
-            .player-info h1 { font-size: 1.8rem; justify-content: center; }
+            .player-info h1 { font-size: 1.5rem; justify-content: center; }
             .player-meta { justify-content: center; }
             
+            /* Fix Vital Stats for Mobile */
             .vital-stats { 
                 width: 100%; 
                 min-width: auto; 
-                grid-template-columns: repeat(2, 1fr); 
+                display: grid;
+                grid-template-columns: repeat(2, 1fr); /* 2x2 Grid */
                 gap: 10px;
             }
             
+            /* Fix Stats Grid for Mobile */
             .stats-grid { 
-                grid-template-columns: repeat(3, 1fr); 
+                width: 100%;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr); /* 2 columns */
                 gap: 10px;
             }
             
-            .stat-card { padding: 12px; }
-            .stat-card .num { font-size: 1.5rem; }
+            .stat-card { padding: 10px; }
+            .stat-card .num { font-size: 1.4rem; }
+            .stat-card .lbl { font-size: 0.65rem; }
             
-            .sidebar { grid-column: 1 / -1; }
+            .sidebar { width: 100%; }
             
-            #log-feed { height: 300px; }
+            #log-feed { height: 250px; }
             
             .top-actions { 
                 width: 100%; 
@@ -392,16 +410,17 @@
                 margin-top: 10px;
             }
             
-            .btn-play-top { flex-grow: 1; justify-content: center; }
+            .btn-play-top { flex-grow: 1; justify-content: center; font-size: 0.8rem; padding: 8px 10px; }
+            .btn-top { font-size: 0.75rem; padding: 8px 12px; }
         }
 
         @media (max-width: 600px) {
-            .setup-header h1 { font-size: 2.2rem; }
+            .setup-header h1 { font-size: 2rem; }
             .input-grid { grid-template-columns: 1fr; gap: 10px; }
-            #setup-screen { padding: 30px 20px; }
+            #setup-screen { padding: 20px; }
             
+            /* Ensure grids stay 2 columns even on very small screens */
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            
             .vital-stats { grid-template-columns: repeat(2, 1fr); }
             
             .modal-content, .changelog-content { 
@@ -413,8 +432,6 @@
             .club-offer { flex-direction: column; gap: 10px; }
             
             .modal-buttons { grid-template-columns: 1fr; }
-            
-            .btn-top { padding: 8px 12px; font-size: 0.75rem; }
         }
     </style>
 </head>
