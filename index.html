@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Football Career Sim v11.5 - Polished</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Football Career Sim</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -57,52 +57,12 @@
             animation-timing-function: ease-in-out;
         }
 
-        /* Complex multi-axis movements */
-        .orb-1 { 
-            width: 60vw; height: 60vw; 
-            background: radial-gradient(circle, #0A84FF, transparent 70%); 
-            top: -20%; left: -20%; 
-            animation-duration: 35s, 40s, 10s; 
-        }
-        .orb-2 { 
-            width: 50vw; height: 50vw; 
-            background: radial-gradient(circle, #BF5AF2, transparent 70%); 
-            bottom: -20%; right: -20%; 
-            animation-duration: 45s, 50s, 12s; 
-            animation-delay: -5s, -10s, -2s;
-        }
-        .orb-3 { 
-            width: 40vw; height: 40vw; 
-            background: radial-gradient(circle, #FF375F, transparent 70%); 
-            top: 30%; left: 30%; 
-            animation-duration: 55s, 60s, 15s; 
-            animation-delay: -15s, -20s, -5s;
-            opacity: 0.4;
-        }
-        .orb-4 { 
-            width: 45vw; height: 45vw; 
-            background: radial-gradient(circle, #30D158, transparent 70%); 
-            top: 10%; right: 10%; 
-            animation-duration: 65s, 70s, 18s; 
-            animation-delay: -25s, -30s, -8s;
-            opacity: 0.3;
-        }
-        .orb-5 { 
-            width: 35vw; height: 35vw; 
-            background: radial-gradient(circle, #FFD60A, transparent 70%); 
-            bottom: 10%; left: 20%; 
-            animation-duration: 75s, 80s, 20s; 
-            animation-delay: -35s, -40s, -10s;
-            opacity: 0.25;
-        }
-        .orb-6 { 
-            width: 55vw; height: 55vw; 
-            background: radial-gradient(circle, #5E5CE6, transparent 70%); 
-            top: 50%; left: -10%; 
-            animation-duration: 85s, 90s, 25s; 
-            animation-delay: -45s, -50s, -12s;
-            opacity: 0.2;
-        }
+        .orb-1 { width: 60vw; height: 60vw; background: radial-gradient(circle, #0A84FF, transparent 70%); top: -20%; left: -20%; animation-duration: 35s, 40s, 10s; }
+        .orb-2 { width: 50vw; height: 50vw; background: radial-gradient(circle, #BF5AF2, transparent 70%); bottom: -20%; right: -20%; animation-duration: 45s, 50s, 12s; animation-delay: -5s, -10s, -2s; }
+        .orb-3 { width: 40vw; height: 40vw; background: radial-gradient(circle, #FF375F, transparent 70%); top: 30%; left: 30%; animation-duration: 55s, 60s, 15s; animation-delay: -15s, -20s, -5s; opacity: 0.4; }
+        .orb-4 { width: 45vw; height: 45vw; background: radial-gradient(circle, #30D158, transparent 70%); top: 10%; right: 10%; animation-duration: 65s, 70s, 18s; animation-delay: -25s, -30s, -8s; opacity: 0.3; }
+        .orb-5 { width: 35vw; height: 35vw; background: radial-gradient(circle, #FFD60A, transparent 70%); bottom: 10%; left: 20%; animation-duration: 75s, 80s, 20s; animation-delay: -35s, -40s, -10s; opacity: 0.25; }
+        .orb-6 { width: 55vw; height: 55vw; background: radial-gradient(circle, #5E5CE6, transparent 70%); top: 50%; left: -10%; animation-duration: 85s, 90s, 25s; animation-delay: -45s, -50s, -12s; opacity: 0.2; }
 
         @keyframes floatOrb1 {
             0% { transform: translate(0, 0) scale(1); }
@@ -261,7 +221,7 @@
 
         /* --- DASHBOARD --- */
         #dashboard {
-            display: none; /* Hidden by default */
+            display: none;
             padding: 25px;
             display: grid;
             grid-template-columns: 3fr 1fr;
@@ -269,11 +229,7 @@
             flex-grow: 1;
         }
 
-        /* Force hide dashboard when not visible to prevent scroll leaks */
-        #dashboard:not(.visible) {
-            display: none !important;
-        }
-
+        #dashboard:not(.visible) { display: none !important; }
         #dashboard.visible { display: grid !important; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
@@ -388,20 +344,77 @@
         .changelog-list li { margin-bottom: 6px; padding-left: 18px; position: relative; color: var(--text-muted); font-size: 0.9rem; }
         .changelog-list li::before { content: "•"; color: var(--success); position: absolute; left: 0; font-weight: bold; }
 
-        /* Responsive */
+        /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 900px) {
-            #dashboard { grid-template-columns: 1fr; padding: 20px; }
+            body { padding: 10px; }
+            #game-container { border-radius: 24px; min-height: 98vh; }
+            .top-bar { padding: 15px 20px; }
+            .brand { font-size: 1.2rem; }
+            
+            #dashboard { 
+                grid-template-columns: 1fr; 
+                padding: 15px; 
+                gap: 15px;
+            }
+            
+            .player-card { 
+                flex-direction: column; 
+                text-align: center; 
+                padding: 20px;
+                gap: 15px;
+            }
+            
+            .player-info h1 { font-size: 1.8rem; justify-content: center; }
+            .player-meta { justify-content: center; }
+            
+            .vital-stats { 
+                width: 100%; 
+                min-width: auto; 
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 10px;
+            }
+            
+            .stats-grid { 
+                grid-template-columns: repeat(3, 1fr); 
+                gap: 10px;
+            }
+            
+            .stat-card { padding: 12px; }
+            .stat-card .num { font-size: 1.5rem; }
+            
             .sidebar { grid-column: 1 / -1; }
-            .player-card { flex-direction: column; text-align: center; }
-            .vital-stats { width: 100%; min-width: auto; justify-content: space-around; }
-            .top-bar { flex-direction: column; gap: 12px; }
-            .top-actions { width: 100%; justify-content: center; }
+            
+            #log-feed { height: 300px; }
+            
+            .top-actions { 
+                width: 100%; 
+                justify-content: space-between; 
+                margin-top: 10px;
+            }
+            
+            .btn-play-top { flex-grow: 1; justify-content: center; }
         }
+
         @media (max-width: 600px) {
-            .vital-stats { grid-template-columns: 1fr 1fr; }
-            .stats-grid { grid-template-columns: 1fr 1fr; }
-            .input-grid { grid-template-columns: 1fr; }
             .setup-header h1 { font-size: 2.2rem; }
+            .input-grid { grid-template-columns: 1fr; gap: 10px; }
+            #setup-screen { padding: 30px 20px; }
+            
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            
+            .vital-stats { grid-template-columns: repeat(2, 1fr); }
+            
+            .modal-content, .changelog-content { 
+                padding: 20px; 
+                border-radius: 20px;
+                width: 95%;
+            }
+            
+            .club-offer { flex-direction: column; gap: 10px; }
+            
+            .modal-buttons { grid-template-columns: 1fr; }
+            
+            .btn-top { padding: 8px 12px; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -418,7 +431,7 @@
 
 <div id="game-container">
     <div class="top-bar">
-        <div class="brand"><i class="fas fa-futbol"></i> PRO CAREER SIM <span style="font-size:0.65rem; opacity:0.5; font-weight:400; margin-left:4px;">v11.5</span></div>
+        <div class="brand"><i class="fas fa-futbol"></i> FOOTBALL CAREER SIM</div>
         <div class="top-actions">
             <button class="btn-play-top" id="btn-play-top" onclick="playSeason()" style="display: none;">
                 <i class="fas fa-play"></i> PLAY
@@ -561,17 +574,16 @@
     <div id="changelog-modal">
         <div class="changelog-content">
             <div class="changelog-header">
-                <h2><i class="fas fa-history" style="color:var(--primary)"></i> Updates</h2>
+                <h2><i class="fas fa-history" style="color:var(--primary)"></i> Patch Notes</h2>
                 <button class="close-modal" onclick="hideChangelog()">&times;</button>
             </div>
             <div class="changelog-entry">
-                <div class="changelog-version">v11.5 - Polished</div>
+                <div class="changelog-version">v1.0 - Release Candidate</div>
                 <ul class="changelog-list">
-                    <li>Ultra-dynamic background orbs with multi-axis movement</li>
-                    <li>Nerfed Striker goal rates for realism</li>
-                    <li>Golden Boot threshold increased (harder to win)</li>
-                    <li>Fixed Wage/Value sync between logs and dashboard</li>
-                    <li>Dashboard completely hidden during player creation</li>
+                    <li><strong>Mobile Polish:</strong> Completely rebuilt the layout for phones. No more squished cards or awkward scrolling.</li>
+                    <li><strong>Data Sync:</strong> Fixed a bug where promotion wages in the log didn't match the dashboard. They now use the exact same calculation.</li>
+                    <li><strong>Balance:</strong> Strikers are slightly less OP, and winning the Golden Boot actually requires a world-class season now.</li>
+                    <li><strong>Vibes:</strong> Tweaked the background animations to be smoother and less distracting.</li>
                 </ul>
             </div>
         </div>
@@ -1093,15 +1105,22 @@
                 player.country = parentClub.country;
                 player.isYouth = false;
                 
-                const seniorValue = Math.max(0.5, (player.ovr * player.ovr) / 200);
-                const seniorWage = Math.max(1, Math.floor(player.ovr / 8));
+                // CALCULATE VALUES EXACTLY AS DASHBOARD DOES
+                const ageFactor = player.age < 24 ? 1.5 : player.age < 29 ? 1.1 : player.age < 33 ? 0.9 : 0.6;
+                const seniorValue = Math.max(0.5, (player.ovr * player.ovr * ageFactor) / 140);
                 
+                const league = getLeagueInfo(player.region, player.league);
+                const leagueStrength = league?.strength || 70;
+                const wageBase = Math.pow(player.ovr, 2.0) / 180;
+                const seniorWage = Math.min(9999, Math.max(1, Math.floor(wageBase * (0.5 + leagueStrength/180))));
+                
+                // Apply blended values
                 player.value = player.value * 0.7 + seniorValue * 0.3;
                 player.salary = player.salary * 0.8 + seniorWage * 0.2;
                 
-                // SYNC: Read directly from player object after update
-                const formattedWage = player.salary.toFixed(1);
-                const formattedValue = player.value.toFixed(2);
+                // SYNC: Use the exact same formatting as updateUI()
+                const formattedWage = player.salary.toFixed(1); // Matches dashboard "€X.XK"
+                const formattedValue = player.value.toFixed(2);   // Matches dashboard "€X.XXM"
                 
                 log(`<span class="log-transfer"><i class="fas fa-arrow-up"></i> PROMOTION:</span> Moved to <b>${player.club}</b>!`, 'transfer');
                 log(`Wage: €${formattedWage}K/week | Value: €${formattedValue}M`, 'info');
