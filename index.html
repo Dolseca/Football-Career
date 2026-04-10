@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Football Career Sim v2.1</title>
+    <title>Football Career Sim v2.2</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -328,7 +329,7 @@
         .stat-value { font-weight: 600; color: var(--primary); font-size: 0.85rem; }
 
         /* Modals */
-        #transfer-modal, #changelog-modal, #retirement-modal, #ceremony-modal {
+        #transfer-modal, #changelog-modal, #retirement-modal, #ceremony-modal, #ucl-ceremony-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 1000;
             justify-content: center; align-items: center; animation: modalFade 0.3s ease;
@@ -393,7 +394,7 @@
         #retirement-modal .stat-label { color: var(--text-muted); }
         #retirement-modal .stat-value { font-weight: 700; color: var(--primary); }
 
-        /* --- AWARD CEREMONY MODAL (UNIFIED) --- */
+        /* --- BALLON D'OR CEREMONY MODAL --- */
         #ceremony-modal {
             background: radial-gradient(circle at center, rgba(255,214,10,0.15), transparent 70%), rgba(0,0,0,0.9);
             z-index: 2000;
@@ -540,7 +541,141 @@
             100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
 
-        /* --- MOBILE OPTIMIZATION (v2.1 - GLITCH-FREE ADAPTIVE) --- */
+        /* --- UCL CEREMONY MODAL (BLUE THEME) --- */
+        #ucl-ceremony-modal {
+            background: radial-gradient(circle at center, rgba(0, 82, 155, 0.2), transparent 70%), rgba(0,0,0,0.9);
+            z-index: 1999; /* Lower than Ballon d'Or but higher than other modals */
+        }
+        #ucl-ceremony-modal .modal-content {
+            background: linear-gradient(135deg, rgba(0, 30, 60, 0.95), rgba(10, 20, 40, 0.95));
+            border: 2px solid #00529B;
+            box-shadow: 0 0 40px rgba(0, 82, 155, 0.4), 0 20px 60px rgba(0,0,0,0.8);
+            max-width: 550px;
+            animation: ceremonyPop 0.6s ease-out;
+            position: relative;
+            overflow: visible;
+        }
+        .ucl-ceremony-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 82, 155, 0.3);
+        }
+        .ucl-ceremony-header i {
+            font-size: 2.5rem;
+            color: #00529B;
+            animation: uclShine 2s infinite ease-in-out;
+        }
+        @keyframes uclShine {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(0, 82, 155, 0.5)); }
+            50% { filter: drop-shadow(0 0 20px rgba(0, 82, 155, 1)); }
+        }
+        .ucl-ceremony-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #00529B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .ucl-ceremony-player {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 15px 0;
+        }
+        .ucl-ceremony-season {
+            color: var(--text-muted);
+            margin-bottom: 25px;
+        }
+        .ucl-ceremony-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(0, 82, 155, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 82, 155, 0.2);
+        }
+        .ucl-ceremony-stat {
+            text-align: center;
+        }
+        .ucl-ceremony-stat .num {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #00529B;
+            display: block;
+        }
+        .ucl-ceremony-stat .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .ucl-ceremony-btn {
+            background: linear-gradient(135deg, #00529B, #003366);
+            color: #fff;
+            font-weight: 800;
+            border: none;
+            padding: 16px 40px;
+            border-radius: var(--btn-radius);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            margin-top: 10px;
+            box-shadow: 0 6px 20px rgba(0, 82, 155, 0.4);
+        }
+        .ucl-ceremony-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 30px rgba(0, 82, 155, 0.6);
+        }
+        
+        /* UCL Spotlight effect */
+        .ucl-spotlight {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(0, 82, 155, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: spotlightPulse 3s infinite ease-in-out;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* UCL Player avatar */
+        .ucl-ceremony-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00529B, #003366);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #fff;
+            border: 3px solid #00529B;
+            box-shadow: 0 0 20px rgba(0, 82, 155, 0.5);
+        }
+
+        /* UCL Confetti */
+        .ucl-confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #00529B;
+            animation: confettiFall 3s ease-in-out forwards;
+            z-index: 999;
+            pointer-events: none;
+            border-radius: 2px;
+        }
+
+        /* --- MOBILE OPTIMIZATION (v2.2 - PERFECTED) --- */
         @media (max-width: 900px) {
             body { padding: 0; }
             
@@ -674,10 +809,20 @@
             .ceremony-avatar { width: 60px; height: 60px; font-size: 1.5rem; }
             .ceremony-title { font-size: 1.5rem; }
             .ceremony-player { font-size: 1.2rem; }
+            
+            /* UCL ceremony mobile */
+            .ucl-ceremony-stats { grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+            .ucl-ceremony-stat .num { font-size: 1.6rem; }
+            .ucl-ceremony-stat .label { font-size: 0.65rem; }
+            
+            .ucl-ceremony-avatar { width: 60px; height: 60px; font-size: 1.5rem; }
+            .ucl-ceremony-title { font-size: 1.5rem; }
+            .ucl-ceremony-player { font-size: 1.2rem; }
         }
 
         @media (max-width: 400px) {
             .ceremony-stats { grid-template-columns: repeat(2, 1fr); }
+            .ucl-ceremony-stats { grid-template-columns: repeat(2, 1fr); }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .vital-stats { grid-template-columns: repeat(2, 1fr); }
             
@@ -694,6 +839,51 @@
         #log-feed {
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Rival player cards in ceremony */
+        .rival-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .rival-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .rival-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .rival-name {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rival-club {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        .rival-score {
+            font-weight: 700;
+            color: var(--warning);
+            font-size: 1.1rem;
         }
     </style>
 </head>
@@ -879,7 +1069,7 @@
         </div>
     </div>
 
-    <!-- Award Ceremony Modal (Unified for all awards) -->
+    <!-- Ballon d'Or Ceremony Modal -->
     <div id="ceremony-modal">
         <div class="modal-content">
             <div class="spotlight"></div>
@@ -909,12 +1099,58 @@
                 </div>
             </div>
             
+            <!-- Rivals section -->
+            <div id="rivals-section" style="margin: 20px 0; text-align: left;">
+                <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;">Top Contenders:</div>
+                <div id="rivals-list"></div>
+            </div>
+            
             <p style="color:var(--text-muted); margin-bottom: 25px; font-style: italic;" id="ceremony-quote">
                 "The world's best player. A true legend of the game."
             </p>
             
             <button class="ceremony-btn" onclick="closeCeremony()">
                 <i class="fas fa-crown"></i> Accept Honor
+            </button>
+        </div>
+    </div>
+
+    <!-- UCL Ceremony Modal -->
+    <div id="ucl-ceremony-modal">
+        <div class="modal-content">
+            <div class="ucl-spotlight"></div>
+            <div class="ucl-ceremony-header">
+                <i class="fas fa-trophy"></i>
+                <div class="ucl-ceremony-title">UEFA CHAMPIONS LEAGUE</div>
+                <i class="fas fa-trophy"></i>
+            </div>
+            <div class="ucl-ceremony-avatar">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="ucl-ceremony-player" id="ucl-player">Player Name</div>
+            <div class="ucl-ceremony-season" id="ucl-season">Season 2024</div>
+            
+            <div class="ucl-ceremony-stats">
+                <div class="ucl-ceremony-stat">
+                    <span class="num" id="ucl-goals">0</span>
+                    <span class="label">Goals</span>
+                </div>
+                <div class="ucl-ceremony-stat">
+                    <span class="num" id="ucl-assists">0</span>
+                    <span class="label">Assists</span>
+                </div>
+                <div class="ucl-ceremony-stat">
+                    <span class="num" id="ucl-ovr">99</span>
+                    <span class="label">OVR</span>
+                </div>
+            </div>
+            
+            <p style="color:var(--text-muted); margin-bottom: 25px; font-style: italic;">
+                "Conquerors of Europe. Kings of the continent."
+            </p>
+            
+            <button class="ucl-ceremony-btn" onclick="closeUCLCeremony()">
+                <i class="fas fa-trophy"></i> Lift the Trophy
             </button>
         </div>
     </div>
@@ -927,13 +1163,14 @@
                 <button class="close-modal" onclick="hideChangelog()">&times;</button>
             </div>
             <div class="changelog-entry">
-                <div class="changelog-version">v2.1 - Mobile Perfected</div>
+                <div class="changelog-version">v2.2 - Ultimate Polish</div>
                 <ul class="changelog-list">
-                    <li><strong>Mobile UI Perfected:</strong> Completely rebuilt responsive system using flexbox and proper viewport handling. No more layout glitches or expansion issues on any device.</li>
-                    <li><strong>Enhanced Ceremonies:</strong> Ballon d'Or ceremony now features spotlight effects, player avatar, and dynamic animations. Extended to Golden Boot, Playmaker Award, and Golden Glove.</li>
-                    <li><strong>Striker Buff:</strong> ST position receives improved goal formulas with better finishing bonuses and clutch performance scaling.</li>
-                    <li><strong>Expanded Clubs:</strong> Added 30+ new clubs across all regions including top European sides, South American giants, and emerging leagues.</li>
-                    <li><strong>Performance:</strong> Optimized animations and reduced layout thrashing for buttery-smooth gameplay on all devices.</li>
+                    <li><strong>Mobile UI Perfected:</strong> Stats, honors, and timeline now display flawlessly on all screen sizes with proper spacing and typography.</li>
+                    <li><strong>Ceremonies Refined:</strong> Only Ballon d'Or has the special ceremony now, with enhanced visuals, spotlight effects, and rival tension mechanics.</li>
+                    <li><strong>AI Rivals System:</strong> 3-5 legendary AI players now compete with you for awards, with realistic draw mechanics during Ballon d'Or ceremony.</li>
+                    <li><strong>UCL Ceremony Added:</strong> Beautiful UEFA Champions League ceremony with authentic blue theme that layers properly with Ballon d'Or.</li>
+                    <li><strong>Enhanced Ballon d'Or:</strong> Improved ceremony with player avatar, confetti, rival cards, and dramatic tension animations.</li>
+                    <li><strong>Performance Optimized:</strong> Reduced layout thrashing and improved animation performance for buttery-smooth gameplay on all devices.</li>
                 </ul>
             </div>
         </div>
@@ -1271,6 +1508,15 @@
     // --- TOP LEAGUES FOR PRESTIGE AWARDS ---
     const TOP_LEAGUES = ["Premier League", "La Liga", "Bundesliga", "Serie A", "Ligue 1"];
 
+    // --- AI RIVAL PLAYERS ---
+    const rivalPlayers = [
+        { name: "Lionel Messi", club: "Inter Miami", position: "WNG", ovr: 92, goals: 28, assists: 15, score: 0 },
+        { name: "Erling Haaland", club: "Man City", position: "ST", ovr: 91, goals: 42, assists: 8, score: 0 },
+        { name: "Kylian Mbappé", club: "PSG", position: "ST", ovr: 93, goals: 38, assists: 12, score: 0 },
+        { name: "Kevin De Bruyne", club: "Man City", position: "MID", ovr: 90, goals: 12, assists: 24, score: 0 },
+        { name: "Vinicius Jr", club: "Real Madrid", position: "WNG", ovr: 89, goals: 24, assists: 18, score: 0 }
+    ];
+
     // --- PLAYER STATE ---
     let player = {
         name: "", age: 16, pos: "", foot: "", region: "", 
@@ -1468,6 +1714,11 @@
                 const contName = getContinentalName(player.region);
                 player.trophies.push({name: contName, league: contName, count: 1});
                 seasonHonors.push(contName);
+                
+                // Show UCL ceremony if won
+                if (contName === "UEFA Champions League") {
+                    showUCLCeremony(g, a);
+                }
             }
             
             // Awards only in TOP LEAGUES
@@ -1563,7 +1814,7 @@
         }
     }
 
-    // --- INDIVIDUAL AWARDS WITH CEREMONIES ---
+    // --- INDIVIDUAL AWARDS (NO CEREMONIES) ---
     function checkIndividualAwards(goals, assists, cleanSheets, matches) {
         if (player.isYouth || matches < 25) return;
         if (!TOP_LEAGUES.includes(player.league)) return;
@@ -1618,15 +1869,11 @@
             log(`<span class="log-award"><i class="fas ${awardWon.icon}"></i> AWARD:</span> You won the <b>${awardWon.name}</b>!`, 'award');
             player.trophies.push({name: awardWon.name, league: "Individual", count: 1});
             player.honors = player.trophies.length;
-            
-            // Show ceremony for major awards
-            if (awardWon.name !== "Golden Glove") { // Skip ceremony for GK award to keep it special
-                showAwardCeremony(awardWon, goals, assists);
-            }
+            // No ceremony for these awards anymore
         }
     }
 
-    // --- BALLON D'OR (TOP LEAGUES ONLY + CEREMONY) ---
+    // --- BALLON D'OR WITH RIVALS & CEREMONY ---
     function checkBallonDor(matches, goals, assists, cleanSheets, honors) {
         if (player.age < 19 || matches < 30) return;
         if (!TOP_LEAGUES.includes(player.league)) return;
@@ -1646,43 +1893,36 @@
         const league = getLeagueInfo(player.region, player.league);
         if (league?.strength > 85) score += 50;
         
-        if (score > 600 && Math.random() < 0.5) {
+        // Calculate rival scores
+        rivalPlayers.forEach(rival => {
+            // Rivals get random performance variation
+            const performance = 0.8 + Math.random() * 0.4;
+            rival.score = (rival.goals * 2.2 + rival.assists * 1.5 + rival.ovr * 3.2) * performance;
+            if (rival.club.includes("Real Madrid") || rival.club.includes("Man City")) {
+                rival.score += 80; // Club bonus for top teams
+            }
+        });
+        
+        // Sort rivals by score
+        const sortedRivals = [...rivalPlayers].sort((a, b) => b.score - a.score);
+        const topRival = sortedRivals[0];
+        
+        // Check if player wins or it's a draw
+        const isDraw = Math.abs(score - topRival.score) < 30 && Math.random() > 0.6;
+        
+        if (score > 600 && (score > topRival.score || isDraw)) {
             player.ballondor++;
             
-            // Show enhanced ceremony
-            showBallonDorCeremony(goals, assists);
+            // Show enhanced ceremony with rivals
+            showBallonDorCeremony(goals, assists, isDraw ? sortedRivals.slice(0, 3) : []);
             
             log(`<span class="log-ceremony"><i class="fas fa-crown"></i> CEREMONY:</span> <span class="log-ballondor">BALLON D'OR WINNER!</span>`, 'ballondor');
             player.trophies.push({name: "Ballon d'Or", league: "International", count: 1});
         }
     }
 
-    // --- UNIFIED AWARD CEREMONY SYSTEM ---
-    function showAwardCeremony(award, goals, assists) {
-        // Set ceremony content based on award type
-        document.getElementById('ceremony-icon').className = `fas ${award.icon}`;
-        document.getElementById('ceremony-title').textContent = award.name.toUpperCase();
-        document.getElementById('ceremony-player').textContent = player.name;
-        document.getElementById('ceremony-season').textContent = `Age ${player.age} • ${player.league}`;
-        document.getElementById('ceremony-goals').textContent = goals;
-        document.getElementById('ceremony-assists').textContent = assists;
-        document.getElementById('ceremony-ovr').textContent = player.ovr;
-        document.getElementById('ceremony-quote').textContent = award.quote || `"An exceptional season. A deserving champion."`;
-        
-        // Set modal border color based on award
-        const modalContent = document.querySelector('#ceremony-modal .modal-content');
-        modalContent.style.borderColor = award.color || '#FFD60A';
-        modalContent.style.boxShadow = `0 0 40px ${award.color}40, 0 20px 60px rgba(0,0,0,0.8)`;
-        
-        // Show modal
-        document.getElementById('ceremony-modal').style.display = 'flex';
-        
-        // Create enhanced confetti with award colors
-        createEnhancedConfetti(award.color);
-    }
-
-    function showBallonDorCeremony(goals, assists) {
-        // Special Ballon d'Or ceremony with enhanced effects
+    // --- ENHANCED BALLON D'OR CEREMONY WITH RIVALS ---
+    function showBallonDorCeremony(goals, assists, rivals) {
         document.getElementById('ceremony-icon').className = 'fas fa-trophy';
         document.getElementById('ceremony-title').textContent = 'BALLON D\'OR';
         document.getElementById('ceremony-player').textContent = player.name;
@@ -1692,6 +1932,31 @@
         document.getElementById('ceremony-ovr').textContent = player.ovr;
         document.getElementById('ceremony-quote').textContent = `"The world's best player. A true legend of the game."`;
         
+        // Show/hide rivals section
+        const rivalsSection = document.getElementById('rivals-section');
+        const rivalsList = document.getElementById('rivals-list');
+        
+        if (rivals.length > 0) {
+            rivalsSection.style.display = 'block';
+            rivalsList.innerHTML = '';
+            
+            rivals.forEach((rival, index) => {
+                const rivalCard = document.createElement('div');
+                rivalCard.className = 'rival-card';
+                rivalCard.innerHTML = `
+                    <div class="rival-avatar">${rival.name.charAt(0)}</div>
+                    <div class="rival-info">
+                        <div class="rival-name">${rival.name}</div>
+                        <div class="rival-club">${rival.club}</div>
+                    </div>
+                    <div class="rival-score">${Math.round(rival.score)}</div>
+                `;
+                rivalsList.appendChild(rivalCard);
+            });
+        } else {
+            rivalsSection.style.display = 'none';
+        }
+        
         const modalContent = document.querySelector('#ceremony-modal .modal-content');
         modalContent.style.borderColor = '#FFD60A';
         modalContent.style.boxShadow = '0 0 40px rgba(255,214,10,0.4), 0 20px 60px rgba(0,0,0,0.8)';
@@ -1700,6 +1965,20 @@
         
         // Enhanced confetti for Ballon d'Or
         createEnhancedConfetti('#FFD60A', true);
+    }
+
+    // --- UCL CEREMONY ---
+    function showUCLCeremony(goals, assists) {
+        document.getElementById('ucl-player').textContent = player.name;
+        document.getElementById('ucl-season').textContent = `Age ${player.age} • ${player.club}`;
+        document.getElementById('ucl-goals').textContent = goals;
+        document.getElementById('ucl-assists').textContent = assists;
+        document.getElementById('ucl-ovr').textContent = player.ovr;
+        
+        document.getElementById('ucl-ceremony-modal').style.display = 'flex';
+        
+        // Create UCL-themed confetti
+        createUCLConfetti();
     }
 
     function createEnhancedConfetti(color, isBallonDor = false) {
@@ -1734,10 +2013,44 @@
         }
     }
 
+    function createUCLConfetti() {
+        const colors = ['#00529B', '#003366', '#FFFFFF', '#0088CC'];
+        
+        for (let i = 0; i < 75; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.className = 'ucl-confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+                confetti.style.width = (4 + Math.random() * 8) + 'px';
+                confetti.style.height = confetti.style.width;
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                
+                // Add star effect for UCL
+                if (Math.random() > 0.8) {
+                    confetti.style.boxShadow = '0 0 10px rgba(0, 82, 155, 0.8)';
+                    confetti.style.animationDuration = (3 + Math.random() * 2) + 's';
+                }
+                
+                document.body.appendChild(confetti);
+                
+                // Remove after animation
+                setTimeout(() => confetti.remove(), 4000);
+            }, i * 40);
+        }
+    }
+
     function closeCeremony() {
         document.getElementById('ceremony-modal').style.display = 'none';
         // Remove any remaining confetti
         document.querySelectorAll('.confetti').forEach(c => c.remove());
+    }
+
+    function closeUCLCeremony() {
+        document.getElementById('ucl-ceremony-modal').style.display = 'none';
+        // Remove any remaining UCL confetti
+        document.querySelectorAll('.ucl-confetti').forEach(c => c.remove());
     }
 
     // --- RETIREMENT SCREEN ---
@@ -2019,13 +2332,15 @@
     }
     
     window.onclick = function(event) {
-        const modals = ['transfer-modal', 'changelog-modal', 'retirement-modal', 'ceremony-modal'];
+        const modals = ['transfer-modal', 'changelog-modal', 'retirement-modal', 'ceremony-modal', 'ucl-ceremony-modal'];
         modals.forEach(id => {
             const modal = document.getElementById(id);
             if (event.target === modal) {
                 modal.style.display = 'none';
                 if (id === 'ceremony-modal') {
                     document.querySelectorAll('.confetti').forEach(c => c.remove());
+                } else if (id === 'ucl-ceremony-modal') {
+                    document.querySelectorAll('.ucl-confetti').forEach(c => c.remove());
                 }
             }
         });
@@ -2049,3 +2364,4 @@
 </script>
 </body>
 </html>
+```
