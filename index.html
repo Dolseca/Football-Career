@@ -1,2367 +1,1481 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Football Career Sim v2.2</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-color: #000000;
-            --glass-surface: rgba(20, 20, 25, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --glass-highlight: rgba(255, 255, 255, 0.08);
-            --primary: #0A84FF;
-            --secondary: #BF5AF2;
-            --accent: #FF375F;
-            --text-main: #FFFFFF;
-            --text-muted: #98989D;
-            --success: #30D158;
-            --warning: #FFD60A;
-            --error: #FF453A;
-            --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-            --card-radius: 24px;
-            --btn-radius: 14px;
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>City Magnate</title>
+  <style>
+    :root {
+      --bg: #09111c;
+      --bg-soft: #102236;
+      --panel: rgba(9, 17, 28, 0.8);
+      --panel-strong: rgba(8, 18, 30, 0.95);
+      --line: rgba(143, 176, 210, 0.16);
+      --text: #eef5ff;
+      --muted: #99aec7;
+      --accent: #4cc9b0;
+      --accent-2: #ffb84d;
+      --danger: #ff6b6b;
+      --success: #59d98e;
+      --shadow: 0 24px 50px rgba(0, 0, 0, 0.28);
+      --font-display: "Segoe UI", "Trebuchet MS", sans-serif;
+      --font-body: "Segoe UI", sans-serif;
+    }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
-        
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow-x: hidden;
-            position: relative;
-        }
-        
-        body {
-            font-family: var(--font-main);
-            background: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-            line-height: 1.5;
-        }
+    * { box-sizing: border-box; }
 
-        /* --- ULTRA DYNAMIC BACKGROUND --- */
-        .ambient-light {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            overflow: hidden;
-            background: #050505;
-            pointer-events: none;
-        }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: var(--font-body);
+      background:
+        radial-gradient(circle at top left, rgba(76, 201, 176, 0.2), transparent 30%),
+        radial-gradient(circle at top right, rgba(255, 184, 77, 0.18), transparent 28%),
+        linear-gradient(180deg, #10213b 0%, #09111c 48%, #071019 100%);
+      overflow-x: hidden;
+    }
 
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.6;
-            animation-name: floatOrb1, floatOrb2, pulseOrb;
-            animation-iteration-count: infinite;
-            animation-timing-function: ease-in-out;
-            will-change: transform, opacity;
-        }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+      opacity: 0.35;
+    }
 
-        .orb-1 { width: 60vw; height: 60vw; background: radial-gradient(circle, #0A84FF, transparent 70%); top: -20%; left: -20%; animation-duration: 35s, 40s, 10s; }
-        .orb-2 { width: 50vw; height: 50vw; background: radial-gradient(circle, #BF5AF2, transparent 70%); bottom: -20%; right: -20%; animation-duration: 45s, 50s, 12s; animation-delay: -5s, -10s, -2s; }
-        .orb-3 { width: 40vw; height: 40vw; background: radial-gradient(circle, #FF375F, transparent 70%); top: 30%; left: 30%; animation-duration: 55s, 60s, 15s; animation-delay: -15s, -20s, -5s; opacity: 0.4; }
-        .orb-4 { width: 45vw; height: 45vw; background: radial-gradient(circle, #30D158, transparent 70%); top: 10%; right: 10%; animation-duration: 65s, 70s, 18s; animation-delay: -25s, -30s, -8s; opacity: 0.3; }
-        .orb-5 { width: 35vw; height: 35vw; background: radial-gradient(circle, #FFD60A, transparent 70%); bottom: 10%; left: 20%; animation-duration: 75s, 80s, 20s; animation-delay: -35s, -40s, -10s; opacity: 0.25; }
-        .orb-6 { width: 55vw; height: 55vw; background: radial-gradient(circle, #5E5CE6, transparent 70%); top: 50%; left: -10%; animation-duration: 85s, 90s, 25s; animation-delay: -45s, -50s, -12s; opacity: 0.2; }
+    button, select, input {
+      font: inherit;
+    }
 
-        @keyframes floatOrb1 {
-            0% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(100px, 50px) scale(1.1); }
-            66% { transform: translate(-50px, 100px) scale(0.9); }
-            100% { transform: translate(0, 0) scale(1); }
-        }
-        @keyframes floatOrb2 {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(-80px, -80px) rotate(180deg); }
-            100% { transform: translate(0, 0) rotate(360deg); }
-        }
-        @keyframes pulseOrb {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 0.7; }
-        }
+    .app {
+      width: min(1500px, calc(100vw - 28px));
+      margin: 18px auto 28px;
+      position: relative;
+      z-index: 1;
+    }
 
-        #game-container {
-            width: 100%;
-            max-width: 1600px; 
-            background: var(--glass-surface);
-            backdrop-filter: blur(50px) saturate(180%);
-            -webkit-backdrop-filter: blur(50px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: 32px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
+    .hero, .panel, .modal-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
 
-        /* --- TOP BAR --- */
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 18px 30px;
-            border-bottom: 1px solid var(--glass-border);
-            background: rgba(0,0,0,0.2);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(20px);
-            flex-shrink: 0;
-        }
+    .hero {
+      border-radius: 28px;
+      padding: 24px;
+      margin-bottom: 18px;
+      overflow: hidden;
+      position: relative;
+    }
 
-        .brand {
-            font-size: 1.4rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #fff, #aaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
-        }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -5% -30% 45%;
+      height: 220px;
+      background: radial-gradient(circle, rgba(76, 201, 176, 0.35), transparent 60%);
+      pointer-events: none;
+    }
 
-        .brand i { 
-            font-size: 1.3rem; 
-            -webkit-text-fill-color: var(--primary);
-        }
+    .hero-top, .stat-strip, .content-grid, .two-col, .property-grid, .stocks, .business-list, .employees {
+      display: grid;
+      gap: 14px;
+    }
 
-        .top-actions { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+    .hero-top {
+      grid-template-columns: 2.2fr 1fr;
+      align-items: start;
+    }
 
-        .btn-top {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: var(--text-main);
-            padding: 8px 16px;
-            border-radius: 100px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: var(--transition);
-            flex-shrink: 0;
-        }
+    h1, h2, h3, h4, p {
+      margin: 0;
+    }
 
-        .btn-top:hover { background: rgba(255,255,255,0.15); transform: scale(1.05); }
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.6rem);
+      letter-spacing: 0.02em;
+      margin-bottom: 10px;
+    }
 
-        .btn-play-top {
-            background: var(--primary);
-            border: none;
-            color: #fff;
-            padding: 8px 20px;
-            border-radius: 100px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: var(--transition);
-            box-shadow: 0 4px 15px rgba(10, 132, 255, 0.3);
-            flex-shrink: 0;
-        }
+    .subtle {
+      color: var(--muted);
+      line-height: 1.55;
+    }
 
-        .btn-play-top:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(10, 132, 255, 0.5); }
-        .btn-play-top:disabled { opacity: 0.5; cursor: not-allowed; transform: none; background: #333; box-shadow: none; }
+    .city-pill, .tag, .ticker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
 
-        /* --- SETUP SCREEN --- */
-        #setup-screen {
-            padding: 50px 40px;
-            text-align: center;
-            max-width: 650px;
-            margin: 0 auto;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
-            z-index: 10;
-            width: 100%;
-        }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 16px rgba(76, 201, 176, 0.8);
+    }
 
-        #setup-screen.hidden { display: none !important; }
+    .hero-side {
+      display: grid;
+      gap: 10px;
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
+    }
 
-        .setup-header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #fff, #888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-        }
+    .stat-strip {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      margin-top: 18px;
+    }
 
-        .setup-header p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 30px; }
+    .stat-card, .panel {
+      border-radius: 22px;
+    }
 
-        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; width: 100%; }
-        .input-group { margin-bottom: 15px; text-align: left; width: 100%; }
-        
-        label {
-            display: block; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;
-            letter-spacing: 1px; margin-bottom: 6px; font-weight: 600; margin-left: 5px;
-        }
+    .stat-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      padding: 16px;
+    }
 
-        input, select {
-            width: 100%; padding: 14px 18px; background: rgba(0,0,0,0.3);
-            border: 1px solid var(--glass-border); border-radius: var(--btn-radius);
-            color: var(--text-main); font-size: 1rem; outline: none; transition: var(--transition);
-            font-family: var(--font-main);
-        }
+    .label {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+    }
 
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15); }
+    .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
 
-        .btn-main {
-            width: 100%; padding: 18px; background: var(--primary); border: none;
-            border-radius: var(--btn-radius); color: #fff; font-weight: 700; font-size: 1.1rem;
-            cursor: pointer; transition: var(--transition); margin-top: 10px;
-            box-shadow: 0 10px 30px rgba(10, 132, 255, 0.25);
-        }
+    .delta-up { color: var(--success); }
+    .delta-down { color: var(--danger); }
 
-        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(10, 132, 255, 0.4); }
+    .content-grid {
+      grid-template-columns: 1.55fr 0.95fr;
+      align-items: start;
+    }
 
-        /* --- DASHBOARD - ADAPTIVE LAYOUT --- */
-        #dashboard {
-            display: none;
-            padding: 25px;
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 20px;
-            flex-grow: 1;
-            width: 100%;
-            max-width: 100%;
-            overflow: hidden;
-        }
+    .panel {
+      padding: 18px;
+    }
 
-        #dashboard:not(.visible) { display: none !important; }
-        #dashboard.visible { display: grid !important; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
 
-        .player-card {
-            grid-column: 1 / -1;
-            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-            border: 1px solid var(--glass-border);
-            padding: 25px;
-            border-radius: var(--card-radius);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 20px;
-            width: 100%;
-        }
+    .panel-head h2 {
+      font-size: 1.15rem;
+    }
 
-        .player-info h1 { margin: 0; font-size: 2rem; color: var(--text-main); display: flex; align-items: center; gap: 12px; }
-        .player-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; font-size: 0.9rem; color: var(--text-muted); }
+    .city-view {
+      position: relative;
+      height: 420px;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(113, 189, 255, 0.22), rgba(8, 16, 28, 0.18) 34%, rgba(7,12,20,0.95)),
+        linear-gradient(135deg, rgba(255,255,255,0.03), transparent 58%);
+    }
 
-        .badge {
-            background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 100px;
-            font-size: 0.75rem; font-weight: 600; color: var(--primary);
-            border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 5px;
-        }
+    .city-view::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 10%, rgba(255,255,255,0.04) 10% 10.6%, transparent 10.6% 20%),
+        repeating-linear-gradient(0deg, transparent 0 10%, rgba(255,255,255,0.04) 10% 10.6%, transparent 10.6% 20%);
+      opacity: 0.3;
+    }
 
-        .vital-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; min-width: 380px; }
-        .vital-item { text-align: center; padding: 12px; background: rgba(0,0,0,0.25); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
-        .vital-item .label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
-        .vital-item .value { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
-        .vital-item .value.highlight { color: var(--success); }
+    .skyline {
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 75%;
+      background:
+        linear-gradient(180deg, transparent 0 28%, rgba(10, 18, 30, 0.15) 29%, rgba(10, 18, 30, 0.9) 100%),
+        linear-gradient(90deg,
+          transparent 0 6%,
+          rgba(18,32,49,0.92) 6% 10%,
+          transparent 10% 12%,
+          rgba(25,41,64,0.9) 12% 18%,
+          transparent 18% 21%,
+          rgba(16,31,49,0.95) 21% 25%,
+          transparent 25% 32%,
+          rgba(19,36,57,0.9) 32% 39%,
+          transparent 39% 43%,
+          rgba(25,47,72,0.92) 43% 49%,
+          transparent 49% 55%,
+          rgba(18,30,48,0.92) 55% 61%,
+          transparent 61% 64%,
+          rgba(22,38,58,0.95) 64% 69%,
+          transparent 69% 75%,
+          rgba(15,27,42,0.92) 75% 82%,
+          transparent 82% 85%,
+          rgba(24,44,67,0.94) 85% 93%,
+          transparent 93% 100%);
+    }
 
-        .stats-grid { grid-column: 1 / 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .stat-card { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px; text-align: center; transition: var(--transition); }
-        .stat-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.08); border-color: var(--primary); }
-        .stat-card .num { font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
-        .stat-card .lbl { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+    .road {
+      position: absolute;
+      background: rgba(18, 26, 37, 0.9);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
 
-        .content-area { grid-column: 1 / 2; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
-        
-        #log-feed {
-            background: rgba(0,0,0,0.25); border-radius: var(--card-radius); padding: 20px;
-            height: 350px; overflow-y: auto; border: 1px solid var(--glass-border);
-            font-size: 0.9rem; scroll-behavior: smooth; flex-grow: 1; display: flex; flex-direction: column;
-            min-width: 0;
-        }
+    .road.h {
+      left: 0;
+      right: 0;
+      height: 18px;
+    }
 
-        .log-item { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 10px; animation: slideIn 0.3s ease; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-        .log-item:last-child { border-bottom: none; }
-        .log-year { color: var(--primary); font-weight: 700; min-width: 55px; font-size: 0.8rem; flex-shrink: 0; }
-        .log-highlight { color: var(--primary); font-weight: 600; }
-        .log-trophy { color: var(--success); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
-        .log-award { color: var(--warning); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
-        .log-ceremony { color: var(--warning); font-weight: 800; display: inline-flex; align-items: center; gap: 4px; text-shadow: 0 0 10px rgba(255, 214, 10, 0.5); }
-        .log-injury { color: var(--error); display: inline-flex; align-items: center; gap: 4px; }
-        .log-transfer { color: var(--secondary); display: inline-flex; align-items: center; gap: 4px; }
-        .log-ballondor { color: var(--warning); font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
+    .road.v {
+      top: 0;
+      bottom: 0;
+      width: 18px;
+    }
 
-        .sidebar { grid-column: 2 / 3; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
-        .trophy-case { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--card-radius); padding: 20px; flex-grow: 1; min-width: 0; }
-        .trophy-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .trophy-header h3 { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-        .trophy-list { display: flex; flex-direction: column; gap: 10px; }
-        .trophy-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(0,0,0,0.25); border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); transition: var(--transition); }
-        .trophy-item:hover { background: rgba(255,255,255,0.08); transform: translateX(4px); }
-        .trophy-icon { font-size: 1.2rem; min-width: 30px; text-align: center; }
-        .trophy-details { flex: 1; min-width: 0; }
-        .trophy-name { font-weight: 600; color: var(--text-main); margin-bottom: 2px; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .trophy-count { font-size: 0.7rem; color: var(--text-muted); }
-        .trophy-league { display: inline-block; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 100px; font-size: 0.65rem; margin-top: 3px; color: var(--text-muted); }
+    .car {
+      position: absolute;
+      width: 16px;
+      height: 8px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--accent-2), #ffd782);
+      box-shadow: 0 0 12px rgba(255, 184, 77, 0.65);
+    }
 
-        .career-stats { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--card-radius); padding: 20px; min-width: 0; }
-        .career-stats h3 { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-weight: 700; }
-        .stats-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .stat-row:last-child { border-bottom: none; }
-        .stat-label { color: var(--text-muted); font-size: 0.8rem; }
-        .stat-value { font-weight: 600; color: var(--primary); font-size: 0.85rem; }
+    .district {
+      position: absolute;
+      width: 120px;
+      min-height: 74px;
+      padding: 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(6, 12, 20, 0.72);
+    }
 
-        /* Modals */
-        #transfer-modal, #changelog-modal, #retirement-modal, #ceremony-modal, #ucl-ceremony-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 1000;
-            justify-content: center; align-items: center; animation: modalFade 0.3s ease;
-            padding: 20px;
-        }
-        @keyframes modalFade { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    .district strong {
+      display: block;
+      margin-bottom: 6px;
+    }
 
-        .modal-content, .changelog-content {
-            background: rgba(20, 20, 25, 0.95); border: 1px solid var(--glass-border);
-            padding: 30px; border-radius: 28px; text-align: center; max-width: 500px; width: 100%;
-            max-width: 500px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6); backdrop-filter: blur(50px);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .changelog-content { max-width: 650px; max-height: 80vh; overflow-y: auto; text-align: left; }
-        
-        .modal-header h2 { color: var(--text-main); margin-top: 0; font-size: 1.6rem; display: flex; justify-content: center; align-items: center; gap: 12px; }
-        .club-offer { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 16px; border: 1px solid var(--glass-border); }
-        .club-logo { width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.4rem; color: #fff; flex-shrink: 0; }
-        .club-details { text-align: left; min-width: 0; }
-        .club-name { font-size: 1.3rem; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .offer-details { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; justify-content: center; }
-        .offer-item { background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 100px; font-size: 0.85rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.1); }
-        .modal-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; }
-        .btn-accept { background: var(--success); color: #000; font-weight: 700; border: none; padding: 14px; border-radius: var(--btn-radius); cursor: pointer; transition: var(--transition); }
-        .btn-accept:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(48, 209, 88, 0.3); }
-        .btn-reject { background: transparent; border: 1px solid var(--error); color: var(--error); font-weight: 700; padding: 14px; border-radius: var(--btn-radius); cursor: pointer; transition: var(--transition); }
-        .btn-reject:hover { background: rgba(255, 69, 58, 0.1); transform: translateY(-2px); }
-        
-        .changelog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--glass-border); }
-        .close-modal { background: none; border: none; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; flex-shrink: 0; }
-        .changelog-entry { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--glass-border); }
-        .changelog-version { font-weight: 700; color: var(--primary); font-size: 1.1rem; margin-bottom: 8px; }
-        .changelog-list { list-style: none; padding-left: 5px; }
-        .changelog-list li { margin-bottom: 6px; padding-left: 18px; position: relative; color: var(--text-muted); font-size: 0.9rem; }
-        .changelog-list li::before { content: "•"; color: var(--success); position: absolute; left: 0; font-weight: bold; }
+    .district small {
+      color: var(--muted);
+      display: block;
+      line-height: 1.4;
+    }
 
-        /* --- RETIREMENT MODAL --- */
-        #retirement-modal .modal-content {
-            max-width: 450px;
-            text-align: center;
-        }
-        #retirement-modal .modal-header h2 {
-            color: var(--warning);
-            font-size: 1.8rem;
-        }
-        #retirement-modal .retirement-stats {
-            margin: 25px 0;
-            padding: 20px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            text-align: left;
-        }
-        #retirement-modal .stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        #retirement-modal .stat-row:last-child { border-bottom: none; }
-        #retirement-modal .stat-label { color: var(--text-muted); }
-        #retirement-modal .stat-value { font-weight: 700; color: var(--primary); }
+    .owned {
+      box-shadow: 0 0 0 1px rgba(76, 201, 176, 0.35), 0 0 22px rgba(76, 201, 176, 0.18);
+    }
 
-        /* --- BALLON D'OR CEREMONY MODAL --- */
-        #ceremony-modal {
-            background: radial-gradient(circle at center, rgba(255,214,10,0.15), transparent 70%), rgba(0,0,0,0.9);
-            z-index: 2000;
-        }
-        #ceremony-modal .modal-content {
-            background: linear-gradient(135deg, rgba(40,30,20,0.95), rgba(20,20,25,0.95));
-            border: 2px solid var(--warning);
-            box-shadow: 0 0 40px rgba(255,214,10,0.4), 0 20px 60px rgba(0,0,0,0.8);
-            max-width: 550px;
-            animation: ceremonyPop 0.6s ease-out;
-            position: relative;
-            overflow: visible;
-        }
-        @keyframes ceremonyPop {
-            0% { transform: scale(0.8); opacity: 0; }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .ceremony-header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255,214,10,0.3);
-        }
-        .ceremony-header i {
-            font-size: 2.5rem;
-            color: var(--warning);
-            animation: trophyShine 2s infinite ease-in-out;
-        }
-        @keyframes trophyShine {
-            0%, 100% { filter: drop-shadow(0 0 5px rgba(255,214,10,0.5)); }
-            50% { filter: drop-shadow(0 0 20px rgba(255,214,10,1)); }
-        }
-        .ceremony-title {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #fff, var(--warning));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .ceremony-player {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin: 15px 0;
-        }
-        .ceremony-season {
-            color: var(--text-muted);
-            margin-bottom: 25px;
-        }
-        .ceremony-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin: 25px 0;
-            padding: 20px;
-            background: rgba(255,214,10,0.05);
-            border-radius: 16px;
-            border: 1px solid rgba(255,214,10,0.2);
-        }
-        .ceremony-stat {
-            text-align: center;
-        }
-        .ceremony-stat .num {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--warning);
-            display: block;
-        }
-        .ceremony-stat .label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-        .ceremony-btn {
-            background: linear-gradient(135deg, var(--warning), #ffb300);
-            color: #000;
-            font-weight: 800;
-            border: none;
-            padding: 16px 40px;
-            border-radius: var(--btn-radius);
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: var(--transition);
-            margin-top: 10px;
-            box-shadow: 0 6px 20px rgba(255,214,10,0.4);
-        }
-        .ceremony-btn:hover {
-            transform: translateY(-3px) scale(1.03);
-            box-shadow: 0 8px 30px rgba(255,214,10,0.6);
-        }
-        
-        /* Spotlight effect for ceremony */
-        .spotlight {
-            position: absolute;
-            top: -50px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(255,214,10,0.3) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: spotlightPulse 3s infinite ease-in-out;
-            pointer-events: none;
-            z-index: -1;
-        }
-        @keyframes spotlightPulse {
-            0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
-            50% { opacity: 0.8; transform: translateX(-50%) scale(1.2); }
-        }
-        
-        /* Player avatar placeholder */
-        .ceremony-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: #fff;
-            border: 3px solid var(--warning);
-            box-shadow: 0 0 20px rgba(255,214,10,0.5);
-        }
+    .two-col {
+      grid-template-columns: 1fr 1fr;
+      margin-top: 14px;
+    }
 
-        /* Confetti animation for ceremony */
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background: var(--warning);
-            animation: confettiFall 3s ease-in-out forwards;
-            z-index: 999;
-            pointer-events: none;
-            border-radius: 2px;
-        }
-        @keyframes confettiFall {
-            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-        }
+    .metric {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+    }
 
-        /* --- UCL CEREMONY MODAL (BLUE THEME) --- */
-        #ucl-ceremony-modal {
-            background: radial-gradient(circle at center, rgba(0, 82, 155, 0.2), transparent 70%), rgba(0,0,0,0.9);
-            z-index: 1999; /* Lower than Ballon d'Or but higher than other modals */
-        }
-        #ucl-ceremony-modal .modal-content {
-            background: linear-gradient(135deg, rgba(0, 30, 60, 0.95), rgba(10, 20, 40, 0.95));
-            border: 2px solid #00529B;
-            box-shadow: 0 0 40px rgba(0, 82, 155, 0.4), 0 20px 60px rgba(0,0,0,0.8);
-            max-width: 550px;
-            animation: ceremonyPop 0.6s ease-out;
-            position: relative;
-            overflow: visible;
-        }
-        .ucl-ceremony-header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(0, 82, 155, 0.3);
-        }
-        .ucl-ceremony-header i {
-            font-size: 2.5rem;
-            color: #00529B;
-            animation: uclShine 2s infinite ease-in-out;
-        }
-        @keyframes uclShine {
-            0%, 100% { filter: drop-shadow(0 0 5px rgba(0, 82, 155, 0.5)); }
-            50% { filter: drop-shadow(0 0 20px rgba(0, 82, 155, 1)); }
-        }
-        .ucl-ceremony-title {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #fff, #00529B);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .ucl-ceremony-player {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin: 15px 0;
-        }
-        .ucl-ceremony-season {
-            color: var(--text-muted);
-            margin-bottom: 25px;
-        }
-        .ucl-ceremony-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin: 25px 0;
-            padding: 20px;
-            background: rgba(0, 82, 155, 0.05);
-            border-radius: 16px;
-            border: 1px solid rgba(0, 82, 155, 0.2);
-        }
-        .ucl-ceremony-stat {
-            text-align: center;
-        }
-        .ucl-ceremony-stat .num {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #00529B;
-            display: block;
-        }
-        .ucl-ceremony-stat .label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-        .ucl-ceremony-btn {
-            background: linear-gradient(135deg, #00529B, #003366);
-            color: #fff;
-            font-weight: 800;
-            border: none;
-            padding: 16px 40px;
-            border-radius: var(--btn-radius);
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: var(--transition);
-            margin-top: 10px;
-            box-shadow: 0 6px 20px rgba(0, 82, 155, 0.4);
-        }
-        .ucl-ceremony-btn:hover {
-            transform: translateY(-3px) scale(1.03);
-            box-shadow: 0 8px 30px rgba(0, 82, 155, 0.6);
-        }
-        
-        /* UCL Spotlight effect */
-        .ucl-spotlight {
-            position: absolute;
-            top: -50px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(0, 82, 155, 0.3) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: spotlightPulse 3s infinite ease-in-out;
-            pointer-events: none;
-            z-index: -1;
-        }
-        
-        /* UCL Player avatar */
-        .ucl-ceremony-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #00529B, #003366);
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: #fff;
-            border: 3px solid #00529B;
-            box-shadow: 0 0 20px rgba(0, 82, 155, 0.5);
-        }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
-        /* UCL Confetti */
-        .ucl-confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background: #00529B;
-            animation: confettiFall 3s ease-in-out forwards;
-            z-index: 999;
-            pointer-events: none;
-            border-radius: 2px;
-        }
+    .btn {
+      border: 0;
+      border-radius: 14px;
+      padding: 11px 14px;
+      cursor: pointer;
+      color: #071019;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), #7ae1d0);
+      transition: transform 0.18s ease, opacity 0.18s ease;
+    }
 
-        /* --- MOBILE OPTIMIZATION (v2.2 - PERFECTED) --- */
-        @media (max-width: 900px) {
-            body { padding: 0; }
-            
-            #game-container { 
-                border-radius: 0; 
-                min-height: 100vh; 
-                width: 100vw;
-                max-width: 100vw;
-                overflow-x: hidden;
-            }
-            
-            .top-bar { 
-                padding: 12px 15px;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-            .brand { font-size: 1.1rem; }
-            
-            /* MOBILE DASHBOARD - FLEXBOX BASED, NO GRID GLITCHES */
-            #dashboard { 
-                display: flex !important;
-                flex-direction: column;
-                padding: 12px; 
-                gap: 12px;
-                width: 100%;
-                max-width: 100%;
-                overflow-x: hidden;
-            }
-            
-            /* Player Card - Mobile */
-            .player-card { 
-                flex-direction: column; 
-                text-align: center; 
-                padding: 15px;
-                gap: 12px;
-                width: 100%;
-                max-width: 100%;
-            }
-            .player-info h1 { font-size: 1.4rem; justify-content: center; }
-            .player-meta { justify-content: center; flex-wrap: wrap; }
-            .badge { font-size: 0.7rem; padding: 4px 10px; }
-            
-            /* Vital Stats - Mobile 2x2 Grid */
-            .vital-stats { 
-                width: 100%; 
-                min-width: auto; 
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-            }
-            .vital-item { padding: 10px; }
-            .vital-item .label { font-size: 0.6rem; }
-            .vital-item .value { font-size: 1.2rem; }
-            
-            /* Stats Grid - Mobile 2x3 */
-            .stats-grid { 
-                width: 100%;
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-            }
-            .stat-card { padding: 10px; border-radius: 16px; }
-            .stat-card .num { font-size: 1.3rem; }
-            .stat-card .lbl { font-size: 0.65rem; }
-            
-            /* Content Area - Mobile */
-            .content-area { width: 100%; min-width: 0; }
-            #log-feed { 
-                height: 220px; 
-                padding: 15px;
-                font-size: 0.85rem;
-                min-width: 0;
-            }
-            .log-item { padding: 8px 0; }
-            .log-year { min-width: 50px; font-size: 0.75rem; }
-            
-            /* Sidebar - Mobile */
-            .sidebar { width: 100%; min-width: 0; }
-            .trophy-case { padding: 15px; }
-            .trophy-header h3 { font-size: 0.8rem; }
-            .trophy-item { padding: 8px; gap: 8px; }
-            .trophy-name { font-size: 0.8rem; }
-            .trophy-count { font-size: 0.65rem; }
-            
-            .career-stats { padding: 15px; }
-            .career-stats h3 { font-size: 0.8rem; margin-bottom: 12px; }
-            .stats-grid-2 { gap: 8px; }
-            .stat-row { padding: 5px 0; }
-            .stat-label { font-size: 0.75rem; }
-            .stat-value { font-size: 0.8rem; }
-            
-            /* Top Actions - Mobile */
-            .top-actions { 
-                width: 100%; 
-                justify-content: space-between; 
-            }
-            .btn-play-top { 
-                flex-grow: 1; 
-                justify-content: center; 
-                font-size: 0.75rem; 
-                padding: 8px 12px; 
-            }
-            .btn-top { font-size: 0.7rem; padding: 8px 12px; }
-        }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
-        @media (max-width: 600px) {
-            .setup-header h1 { font-size: 1.8rem; }
-            .setup-header p { font-size: 1rem; }
-            .input-grid { grid-template-columns: 1fr; gap: 10px; }
-            #setup-screen { padding: 20px 15px; }
-            
-            /* Ultra-small screens */
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .vital-stats { grid-template-columns: repeat(2, 1fr); }
-            
-            .modal-content, .changelog-content { 
-                padding: 20px 15px; 
-                border-radius: 20px;
-                width: 95%;
-                max-width: 95vw;
-            }
-            
-            .club-offer { flex-direction: column; gap: 10px; }
-            .modal-buttons { grid-template-columns: 1fr; }
-            
-            /* Ceremony modal mobile */
-            .ceremony-stats { grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
-            .ceremony-stat .num { font-size: 1.6rem; }
-            .ceremony-stat .label { font-size: 0.65rem; }
-            
-            .ceremony-avatar { width: 60px; height: 60px; font-size: 1.5rem; }
-            .ceremony-title { font-size: 1.5rem; }
-            .ceremony-player { font-size: 1.2rem; }
-            
-            /* UCL ceremony mobile */
-            .ucl-ceremony-stats { grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
-            .ucl-ceremony-stat .num { font-size: 1.6rem; }
-            .ucl-ceremony-stat .label { font-size: 0.65rem; }
-            
-            .ucl-ceremony-avatar { width: 60px; height: 60px; font-size: 1.5rem; }
-            .ucl-ceremony-title { font-size: 1.5rem; }
-            .ucl-ceremony-player { font-size: 1.2rem; }
-        }
+    .btn.alt {
+      color: var(--text);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--line);
+    }
 
-        @media (max-width: 400px) {
-            .ceremony-stats { grid-template-columns: repeat(2, 1fr); }
-            .ucl-ceremony-stats { grid-template-columns: repeat(2, 1fr); }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .vital-stats { grid-template-columns: repeat(2, 1fr); }
-            
-            .vital-item .value { font-size: 1.1rem; }
-            .stat-card .num { font-size: 1.2rem; }
-        }
-        
-        /* Prevent layout shift on mobile when dashboard appears */
-        #dashboard.visible {
-            contain: layout style paint;
-        }
-        
-        /* Smooth scrolling for log feed */
-        #log-feed {
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        /* Rival player cards in ceremony */
-        .rival-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 12px;
-            margin: 8px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .rival-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--secondary), var(--accent));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: #fff;
-            flex-shrink: 0;
-        }
-        .rival-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .rival-name {
-            font-weight: 600;
-            color: var(--text-main);
-            font-size: 0.9rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .rival-club {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-        .rival-score {
-            font-weight: 700;
-            color: var(--warning);
-            font-size: 1.1rem;
-        }
-    </style>
+    .btn.warn {
+      color: #1a0f08;
+      background: linear-gradient(135deg, var(--accent-2), #ffd18a);
+    }
+
+    .mini {
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      border-radius: 12px;
+    }
+
+    .property-grid, .stocks, .business-list, .employees {
+      grid-template-columns: 1fr;
+    }
+
+    .list-card {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stack {
+      display: grid;
+      gap: 6px;
+    }
+
+    .progress {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), #7be1d0);
+    }
+
+    .stocks {
+      margin-top: 14px;
+    }
+
+    .stock-line {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .leaderboard-entry {
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .leaderboard-entry:last-child { border-bottom: 0; }
+
+    .news-feed {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+      max-height: 320px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .news-feed::-webkit-scrollbar { width: 8px; }
+    .news-feed::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+
+    .feed-item {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+    }
+
+    .setup-overlay {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: rgba(2, 6, 12, 0.72);
+      backdrop-filter: blur(10px);
+      z-index: 8;
+    }
+
+    .modal-card {
+      width: min(760px, 100%);
+      border-radius: 30px;
+      padding: 28px;
+    }
+
+    .setup-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1.1fr 1fr;
+      margin-top: 18px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field input, .field select {
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+    }
+
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .type-card {
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .type-card.active {
+      border-color: rgba(76, 201, 176, 0.6);
+      box-shadow: 0 0 0 1px rgba(76, 201, 176, 0.28);
+      transform: translateY(-2px);
+    }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 1120px) {
+      .stat-strip, .content-grid, .hero-top, .setup-grid, .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        width: min(100vw - 16px, 1500px);
+        margin: 8px auto 16px;
+      }
+
+      .hero, .panel, .modal-card {
+        border-radius: 22px;
+      }
+
+      .city-view {
+        height: 320px;
+      }
+
+      .type-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div id="setup" class="setup-overlay">
+    <div class="modal-card">
+      <div class="city-pill"><span class="dot"></span> Shared City Session</div>
+      <h1>City Magnate</h1>
+      <p class="subtle">Build a company inside one living metropolis. Compete on a shared leaderboard, react to city events, buy prime districts, trade stocks, and scale from a tiny office into a city-shaping empire.</p>
 
-<div class="ambient-light">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <div class="orb orb-4"></div>
-    <div class="orb orb-5"></div>
-    <div class="orb orb-6"></div>
-</div>
-
-<div id="game-container">
-    <div class="top-bar">
-        <div class="brand"><i class="fas fa-futbol"></i> FOOTBALL CAREER SIM</div>
-        <div class="top-actions">
-            <button class="btn-play-top" id="btn-play-top" onclick="playSeason()" style="display: none;">
-                <i class="fas fa-play"></i> PLAY
-            </button>
-            <button class="btn-top" onclick="showChangelog()"><i class="fas fa-history"></i> Updates</button>
+      <div class="setup-grid">
+        <div class="field">
+          <label for="playerName">Player Name</label>
+          <input id="playerName" maxlength="24" placeholder="Avery Morgan" />
         </div>
+        <div class="field">
+          <label for="companyName">Company Name</label>
+          <input id="companyName" maxlength="28" placeholder="Northline Group" />
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:16px;">
+        <label>Choose a Business Type</label>
+        <div id="typeGrid" class="type-grid"></div>
+      </div>
+
+      <div class="footer-note">Open this file in multiple browser tabs to simulate live local multiplayer. AI-run rivals keep the city competitive even if you play solo.</div>
+      <div class="actions" style="margin-top:18px;">
+        <button id="startBtn" class="btn">Launch Company</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Setup Screen -->
-    <div id="setup-screen">
-        <div class="setup-header">
-            <h1>Create Legend</h1>
-            <p>Start your journey from academy to icon.</p>
-        </div>
-        <div class="input-grid">
-            <div class="input-group">
-                <label>Name</label>
-                <input type="text" id="input-name" placeholder="e.g. Kylian Mbappé" value="">
-            </div>
-            <div class="input-group">
-                <label>Foot</label>
-                <select id="input-foot">
-                    <option value="Right">Right</option>
-                    <option value="Left">Left</option>
-                    <option value="Both">Two-Footed</option>
-                </select>
-            </div>
-        </div>
-        <div class="input-grid">
-            <div class="input-group">
-                <label>Position</label>
-                <select id="input-pos">
-                    <option value="ST">Striker (ST)</option>
-                    <option value="WNG">Winger (LW/RW)</option>
-                    <option value="MID">Midfielder (CM)</option>
-                    <option value="DEF">Defender (CB)</option>
-                    <option value="GK">Goalkeeper (GK)</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Region</label>
-                <select id="input-region">
-                    <option value="Europe">Europe</option>
-                    <option value="South America">South America</option>
-                    <option value="Africa">Africa</option>
-                    <option value="North America">North America</option>
-                    <option value="Asia">Asia</option>
-                    <option value="Oceania">Oceania</option>
-                </select>
-            </div>
-        </div>
-        <button class="btn-main" onclick="startGame()">Begin Career</button>
-    </div>
-
-    <!-- Dashboard -->
-    <div id="dashboard">
-        <div class="player-card">
-            <div class="player-info">
-                <h1 id="disp-name">Player <span style="font-size:1.1rem; color:var(--text-muted); font-weight:400;">#10</span></h1>
-                <div class="player-meta">
-                    <span id="disp-club" class="badge"><i class="fas fa-building"></i> Club</span>
-                    <span id="disp-region" class="badge"><i class="fas fa-globe"></i> Region</span>
-                    <span id="disp-pos" class="badge"><i class="fas fa-shoe-prints"></i> POS</span>
-                </div>
-            </div>
-            <div class="vital-stats">
-                <div class="vital-item"><div class="label">Age</div><div class="value" id="disp-age">16</div></div>
-                <div class="vital-item"><div class="label">OVR</div><div class="value" id="disp-ovr" style="color:var(--primary)">55</div></div>
-                <div class="vital-item"><div class="label">Value</div><div class="value" id="disp-value">€0.5M</div></div>
-                <div class="vital-item"><div class="label">Honors</div><div class="value highlight" id="disp-honors">0</div></div>
-            </div>
+  <div class="app">
+    <section class="hero">
+      <div class="hero-top">
+        <div class="stack">
+          <div id="sessionPill" class="city-pill"><span class="dot"></span> Metrovale Online</div>
+          <h1 id="companyTitle">Preparing Your Company</h1>
+          <p id="headline" class="subtle">The city economy, player businesses, traffic congestion, and stock market move in real time. Quick decisions stack into long-term advantages.</p>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card"><div class="num" id="stat-matches">0</div><div class="lbl">Matches</div></div>
-            <div class="stat-card"><div class="num" id="stat-goals">0</div><div class="lbl" id="lbl-goals">Goals</div></div>
-            <div class="stat-card"><div class="num" id="stat-assists">0</div><div class="lbl" id="lbl-assists">Assists</div></div>
-            <div class="stat-card"><div class="num" id="stat-cs">0</div><div class="lbl">Clean Sheets</div></div>
-            <div class="stat-card"><div class="num" id="stat-salary">€0K</div><div class="lbl">Wage</div></div>
-            <div class="stat-card"><div class="num" id="stat-finish">0</div><div class="lbl">Finishing</div></div>
+        <div class="hero-side">
+          <div class="label">Current City Event</div>
+          <div id="eventTitle" class="value" style="font-size:1.15rem;">Opening Bell</div>
+          <div id="eventImpact" class="subtle">Profits and demand are stable.</div>
+        </div>
+      </div>
+
+      <div class="stat-strip">
+        <div class="stat-card">
+          <div class="label">Cash</div>
+          <div id="cashValue" class="value">$0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Revenue / Tick</div>
+          <div id="revenueValue" class="value">$0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Net Worth</div>
+          <div id="worthValue" class="value">$0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Employees</div>
+          <div id="employeesValue" class="value">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Market Share</div>
+          <div id="shareValue" class="value">0%</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">City Traffic</div>
+          <div id="trafficValue" class="value">0%</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <div class="stack">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Metrovale City</h2>
+            <div id="citySignals" class="tag">Economy Balanced</div>
+          </div>
+          <div class="city-view" id="cityView">
+            <div class="skyline"></div>
+            <div class="road h" style="top: 23%;"></div>
+            <div class="road h" style="top: 50%;"></div>
+            <div class="road h" style="top: 76%;"></div>
+            <div class="road v" style="left: 21%;"></div>
+            <div class="road v" style="left: 50%;"></div>
+            <div class="road v" style="left: 77%;"></div>
+          </div>
+          <div class="two-col">
+            <div class="metric">
+              <div class="label">Demand Index</div>
+              <div id="demandMetric" class="value" style="font-size:1.1rem;">100</div>
+            </div>
+            <div class="metric">
+              <div class="label">Real Estate Heat</div>
+              <div id="estateMetric" class="value" style="font-size:1.1rem;">100</div>
+            </div>
+            <div class="metric">
+              <div class="label">City Economy</div>
+              <div id="economyMetric" class="value" style="font-size:1.1rem;">100</div>
+            </div>
+            <div class="metric">
+              <div class="label">Current Date</div>
+              <div id="dateMetric" class="value" style="font-size:1.1rem;">Jan 2026</div>
+            </div>
+          </div>
         </div>
 
-        <div class="content-area">
-            <div id="log-feed">
-                <div class="log-item"><div class="log-year">INFO</div><div>Welcome. Press PLAY to start.</div></div>
-            </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Operations</h2>
+            <div id="businessTag" class="tag">Business Type</div>
+          </div>
+          <div class="business-list" id="businessStats"></div>
+          <div class="actions" style="margin-top:16px;">
+            <button class="btn" id="marketBtn">Run Marketing Campaign</button>
+            <button class="btn alt" id="upgradeBtn">Upgrade Headquarters</button>
+            <button class="btn warn" id="expandBtn">Open New Branch</button>
+          </div>
         </div>
 
-        <div class="sidebar">
-            <div class="trophy-case">
-                <div class="trophy-header">
-                    <h3><i class="fas fa-trophy"></i> Honors</h3>
-                    <div class="badge" id="total-trophies">0</div>
-                </div>
-                <div id="trophy-list" class="trophy-list">
-                    <div class="trophy-item">
-                        <div class="trophy-icon" style="color: var(--text-muted);"><i class="fas fa-graduation-cap"></i></div>
-                        <div class="trophy-details"><div class="trophy-name">Youth Dev</div><div class="trophy-count">Academy</div></div>
-                    </div>
-                </div>
-            </div>
-            <div class="career-stats">
-                <h3><i class="fas fa-chart-line"></i> Stats</h3>
-                <div class="stats-grid-2">
-                    <div class="stat-row"><span class="stat-label">Matches</span><span class="stat-value" id="stat-career-matches">0</span></div>
-                    <div class="stat-row"><span class="stat-label">Goals</span><span class="stat-value" id="stat-career-goals">0</span></div>
-                    <div class="stat-row"><span class="stat-label">Assists</span><span class="stat-value" id="stat-career-assists">0</span></div>
-                    <div class="stat-row"><span class="stat-label">Clean Sheets</span><span class="stat-value" id="stat-career-cs">0</span></div>
-                    <div class="stat-row"><span class="stat-label">Avg G/M</span><span class="stat-value" id="stat-gpm">0.00</span></div>
-                    <div class="stat-row"><span class="stat-label">Peak OVR</span><span class="stat-value" id="stat-highest-ovr">55</span></div>
-                </div>
-            </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Stock Market</h2>
+            <div class="tag">Trade city-listed firms</div>
+          </div>
+          <div id="stocks" class="stocks"></div>
         </div>
-    </div>
+      </div>
 
-    <!-- Transfer Modal -->
-    <div id="transfer-modal">
-        <div class="modal-content">
-            <div class="modal-header"><h2><i class="fas fa-exchange-alt" style="color:var(--secondary)"></i> Offer</h2></div>
-            <div class="club-offer">
-                <div class="club-logo" id="modal-club-logo">?</div>
-                <div class="club-details">
-                    <div class="club-name" id="modal-club-name">Club</div>
-                    <div class="club-league" id="modal-club-league" style="color:var(--text-muted); font-size:0.85rem;">League</div>
-                </div>
-            </div>
-            <div class="offer-details">
-                <div class="offer-item"><i class="fas fa-coins" style="color:var(--warning)"></i> €<span id="modal-fee">0</span>M</div>
-                <div class="offer-item"><i class="fas fa-hand-holding-usd" style="color:var(--success)"></i> €<span id="modal-wage">0</span>K/w</div>
-            </div>
-            <p id="transfer-text" style="font-size:0.95rem; margin: 15px 0 20px; color: var(--text-muted);"></p>
-            <div class="modal-buttons">
-                <button class="btn-accept" onclick="handleTransfer(true)">Accept</button>
-                <button class="btn-reject" onclick="handleTransfer(false)">Reject</button>
-            </div>
+      <div class="stack">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Real Estate</h2>
+            <div class="tag">Buy districts and boost capacity</div>
+          </div>
+          <div id="properties" class="property-grid"></div>
         </div>
-    </div>
 
-    <!-- Retirement Modal -->
-    <div id="retirement-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-flag-checkered" style="color:var(--warning)"></i> Career Complete</h2>
-            </div>
-            <p style="color:var(--text-muted); margin: 15px 0 20px;">Thank you for playing! Here's your legacy:</p>
-            
-            <div class="retirement-stats">
-                <div class="stat-row"><span class="stat-label">Final Age</span><span class="stat-value" id="retire-age">40</span></div>
-                <div class="stat-row"><span class="stat-label">Peak OVR</span><span class="stat-value" id="retire-peak">99</span></div>
-                <div class="stat-row"><span class="stat-label">Total Goals</span><span class="stat-value" id="retire-goals">0</span></div>
-                <div class="stat-row"><span class="stat-label">Total Assists</span><span class="stat-value" id="retire-assists">0</span></div>
-                <div class="stat-row"><span class="stat-label">Trophies Won</span><span class="stat-value" id="retire-trophies">0</span></div>
-                <div class="stat-row"><span class="stat-label">Ballon d'Or</span><span class="stat-value" id="retire-ballondor">0</span></div>
-            </div>
-            
-            <p style="color:var(--text-muted); margin-bottom: 25px;">Ready to create a new legend?</p>
-            
-            <div class="modal-buttons">
-                <button class="btn-accept" onclick="restartGame()">
-                    <i class="fas fa-redo"></i> New Career
-                </button>
-                <button class="btn-reject" onclick="hideRetirement()">
-                    <i class="fas fa-times"></i> Close
-                </button>
-            </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Employees</h2>
+            <div id="moraleTag" class="tag">Morale 0%</div>
+          </div>
+          <div id="employeesPanel" class="employees"></div>
+          <div class="actions" style="margin-top:14px;">
+            <button class="btn" id="hireBtn">Hire Staff</button>
+            <button class="btn alt" id="trainBtn">Fund Training</button>
+          </div>
         </div>
-    </div>
 
-    <!-- Ballon d'Or Ceremony Modal -->
-    <div id="ceremony-modal">
-        <div class="modal-content">
-            <div class="spotlight"></div>
-            <div class="ceremony-header">
-                <i class="fas fa-trophy" id="ceremony-icon"></i>
-                <div class="ceremony-title" id="ceremony-title">BALLON D'OR</div>
-                <i class="fas fa-trophy"></i>
-            </div>
-            <div class="ceremony-avatar">
-                <i class="fas fa-user"></i>
-            </div>
-            <div class="ceremony-player" id="ceremony-player">Player Name</div>
-            <div class="ceremony-season" id="ceremony-season">Season 2024</div>
-            
-            <div class="ceremony-stats">
-                <div class="ceremony-stat">
-                    <span class="num" id="ceremony-goals">0</span>
-                    <span class="label">Goals</span>
-                </div>
-                <div class="ceremony-stat">
-                    <span class="num" id="ceremony-assists">0</span>
-                    <span class="label">Assists</span>
-                </div>
-                <div class="ceremony-stat">
-                    <span class="num" id="ceremony-ovr">99</span>
-                    <span class="label">OVR</span>
-                </div>
-            </div>
-            
-            <!-- Rivals section -->
-            <div id="rivals-section" style="margin: 20px 0; text-align: left;">
-                <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;">Top Contenders:</div>
-                <div id="rivals-list"></div>
-            </div>
-            
-            <p style="color:var(--text-muted); margin-bottom: 25px; font-style: italic;" id="ceremony-quote">
-                "The world's best player. A true legend of the game."
-            </p>
-            
-            <button class="ceremony-btn" onclick="closeCeremony()">
-                <i class="fas fa-crown"></i> Accept Honor
-            </button>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Leaderboard</h2>
+            <div class="tag">Shared city standings</div>
+          </div>
+          <div id="leaderboard"></div>
         </div>
-    </div>
 
-    <!-- UCL Ceremony Modal -->
-    <div id="ucl-ceremony-modal">
-        <div class="modal-content">
-            <div class="ucl-spotlight"></div>
-            <div class="ucl-ceremony-header">
-                <i class="fas fa-trophy"></i>
-                <div class="ucl-ceremony-title">UEFA CHAMPIONS LEAGUE</div>
-                <i class="fas fa-trophy"></i>
-            </div>
-            <div class="ucl-ceremony-avatar">
-                <i class="fas fa-star"></i>
-            </div>
-            <div class="ucl-ceremony-player" id="ucl-player">Player Name</div>
-            <div class="ucl-ceremony-season" id="ucl-season">Season 2024</div>
-            
-            <div class="ucl-ceremony-stats">
-                <div class="ucl-ceremony-stat">
-                    <span class="num" id="ucl-goals">0</span>
-                    <span class="label">Goals</span>
-                </div>
-                <div class="ucl-ceremony-stat">
-                    <span class="num" id="ucl-assists">0</span>
-                    <span class="label">Assists</span>
-                </div>
-                <div class="ucl-ceremony-stat">
-                    <span class="num" id="ucl-ovr">99</span>
-                    <span class="label">OVR</span>
-                </div>
-            </div>
-            
-            <p style="color:var(--text-muted); margin-bottom: 25px; font-style: italic;">
-                "Conquerors of Europe. Kings of the continent."
-            </p>
-            
-            <button class="ucl-ceremony-btn" onclick="closeUCLCeremony()">
-                <i class="fas fa-trophy"></i> Lift the Trophy
-            </button>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>City News</h2>
+            <div class="tag">Live market brief</div>
+          </div>
+          <div id="newsFeed" class="news-feed"></div>
         </div>
-    </div>
+      </div>
+    </section>
+  </div>
 
-    <!-- Changelog Modal -->
-    <div id="changelog-modal">
-        <div class="changelog-content">
-            <div class="changelog-header">
-                <h2><i class="fas fa-history" style="color:var(--primary)"></i> Patch Notes</h2>
-                <button class="close-modal" onclick="hideChangelog()">&times;</button>
-            </div>
-            <div class="changelog-entry">
-                <div class="changelog-version">v2.2 - Ultimate Polish</div>
-                <ul class="changelog-list">
-                    <li><strong>Mobile UI Perfected:</strong> Stats, honors, and timeline now display flawlessly on all screen sizes with proper spacing and typography.</li>
-                    <li><strong>Ceremonies Refined:</strong> Only Ballon d'Or has the special ceremony now, with enhanced visuals, spotlight effects, and rival tension mechanics.</li>
-                    <li><strong>AI Rivals System:</strong> 3-5 legendary AI players now compete with you for awards, with realistic draw mechanics during Ballon d'Or ceremony.</li>
-                    <li><strong>UCL Ceremony Added:</strong> Beautiful UEFA Champions League ceremony with authentic blue theme that layers properly with Ballon d'Or.</li>
-                    <li><strong>Enhanced Ballon d'Or:</strong> Improved ceremony with player avatar, confetti, rival cards, and dramatic tension animations.</li>
-                    <li><strong>Performance Optimized:</strong> Reduced layout thrashing and improved animation performance for buttery-smooth gameplay on all devices.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+  <script>
+    const STORAGE_KEY = "city_magnate_shared_v1";
+    const PLAYER_KEY = "city_magnate_player_v1";
+    const CHANNEL = "city-magnate-live";
+    const TICK_MS = 1800;
+    const CITY_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-<script>
-    // --- DATA STRUCTURES ---
-    const regions = {
-        "Europe": { 
-            leagues: [
-                { name: "Premier League", strength: 94, country: "England" },
-                { name: "La Liga", strength: 93, country: "Spain" },
-                { name: "Bundesliga", strength: 91, country: "Germany" },
-                { name: "Serie A", strength: 90, country: "Italy" },
-                { name: "Ligue 1", strength: 87, country: "France" },
-                { name: "Eredivisie", strength: 84, country: "Netherlands" },
-                { name: "Primeira Liga", strength: 83, country: "Portugal" },
-                { name: "Super Lig", strength: 79, country: "Turkey" },
-                { name: "Belgian Pro League", strength: 77, country: "Belgium" },
-                { name: "Scottish Premiership", strength: 74, country: "Scotland" }
-            ], 
-            cups: {
-                "Premier League": "FA Cup", "La Liga": "Copa del Rey", "Bundesliga": "DFB-Pokal",
-                "Serie A": "Coppa Italia", "Ligue 1": "Coupe de France", "Eredivisie": "KNVB Cup",
-                "Primeira Liga": "Taça de Portugal", "Super Lig": "Turkish Cup",
-                "Belgian Pro League": "Belgian Cup", "Scottish Premiership": "Scottish Cup"
-            }
-        },
-        "South America": { 
-            leagues: [
-                { name: "Brasileirão", strength: 81, country: "Brazil" },
-                { name: "Liga Profesional", strength: 79, country: "Argentina" },
-                { name: "Primera División", strength: 77, country: "Uruguay" },
-                { name: "Campeonato Uruguayo", strength: 74, country: "Uruguay" },
-                { name: "Serie A Ecuador", strength: 69, country: "Ecuador" }
-            ],
-            cups: {
-                "Brasileirão": "Copa do Brasil", "Liga Profesional": "Copa Argentina",
-                "Primera División": "Copa Uruguay", "Campeonato Uruguayo": "Copa Uruguay",
-                "Serie A Ecuador": "Copa Ecuador"
-            }
-        },
-        "Africa": { 
-            leagues: [
-                { name: "Egyptian Premier League", strength: 69, country: "Egypt" },
-                { name: "Botola Pro", strength: 67, country: "Morocco" },
-                { name: "Tunisian Ligue 1", strength: 64, country: "Tunisia" },
-                { name: "South African Prem", strength: 61, country: "South Africa" },
-                { name: "KPL", strength: 59, country: "Kenya" }
-            ],
-            cups: {
-                "Egyptian Premier League": "Egypt Cup", "Botola Pro": "Throne Cup",
-                "Tunisian Ligue 1": "TN Cup", "South African Prem": "Nedbank Cup", "KPL": "FKF Cup"
-            }
-        },
-        "North America": { 
-            leagues: [
-                { name: "MLS", strength: 74, country: "USA/Canada" },
-                { name: "Liga MX", strength: 71, country: "Mexico" },
-                { name: "Canadian Prem", strength: 64, country: "Canada" },
-                { name: "Liga Costa Rica", strength: 59, country: "Costa Rica" }
-            ],
-            cups: {
-                "MLS": "US Open Cup", "Liga MX": "Copa MX",
-                "Canadian Prem": "Canadian Championship", "Liga Costa Rica": "Copa Costa Rica"
-            }
-        },
-        "Asia": { 
-            leagues: [
-                { name: "Saudi Pro League", strength: 77, country: "Saudi Arabia" },
-                { name: "J1 League", strength: 74, country: "Japan" },
-                { name: "K League 1", strength: 71, country: "South Korea" },
-                { name: "Chinese Super League", strength: 69, country: "China" },
-                { name: "Qatar Stars League", strength: 67, country: "Qatar" },
-                { name: "UAE Pro League", strength: 64, country: "UAE" }
-            ],
-            cups: {
-                "Saudi Pro League": "King Cup", "J1 League": "Emperor's Cup",
-                "K League 1": "FA Cup", "Chinese Super League": "CFA Cup",
-                "Qatar Stars League": "Emir Cup", "UAE Pro League": "President's Cup"
-            }
-        },
-        "Oceania": { 
-            leagues: [
-                { name: "A-League Men", strength: 59, country: "Australia" },
-                { name: "New Zealand Prem", strength: 54, country: "New Zealand" }
-            ],
-            cups: { "A-League Men": "FFA Cup", "New Zealand Prem": "Chatham Cup" }
-        }
+    const businessTypes = {
+      taxi: {
+        name: "Taxi Company",
+        description: "Thrives on traffic and commuter surges with fleet-heavy scaling.",
+        baseCash: 95000,
+        margin: 1.02,
+        trafficBias: 1.2,
+        eventBias: { festival: 1.2, transit: 1.15, recession: 0.84 },
+        staffMix: ["Drivers", "Dispatchers", "Mechanics"]
+      },
+      restaurant: {
+        name: "Restaurant Group",
+        description: "Demand spikes with nightlife, tourism, and brand reputation.",
+        baseCash: 105000,
+        margin: 1.08,
+        trafficBias: 0.95,
+        eventBias: { tourism: 1.25, food: 1.18, recession: 0.86 },
+        staffMix: ["Chefs", "Servers", "Managers"]
+      },
+      startup: {
+        name: "Tech Startup",
+        description: "Fast growth, volatile returns, and major upside from talent and upgrades.",
+        baseCash: 120000,
+        margin: 1.15,
+        trafficBias: 0.7,
+        eventBias: { venture: 1.3, cyber: 0.78, recession: 0.88 },
+        staffMix: ["Engineers", "Designers", "Sales"]
+      },
+      delivery: {
+        name: "Delivery Service",
+        description: "Balances logistics, route optimization, and urban demand pockets.",
+        baseCash: 98000,
+        margin: 1.05,
+        trafficBias: 1.08,
+        eventBias: { storm: 1.18, festival: 1.1, transit: 1.12 },
+        staffMix: ["Couriers", "Packers", "Schedulers"]
+      },
+      bank: {
+        name: "Retail Bank",
+        description: "Earns through scale, stability, and investment timing.",
+        baseCash: 150000,
+        margin: 1.12,
+        trafficBias: 0.55,
+        eventBias: { boom: 1.18, recession: 0.72, rate: 1.14 },
+        staffMix: ["Analysts", "Advisors", "Tellers"]
+      },
+      gas: {
+        name: "Gas Station Chain",
+        description: "Benefits from congestion, transport demand, and prime roadside property.",
+        baseCash: 110000,
+        margin: 1.04,
+        trafficBias: 1.28,
+        eventBias: { transit: 1.16, storm: 1.12, green: 0.78 },
+        staffMix: ["Attendants", "Buyers", "Shift Leads"]
+      }
     };
 
-    const academies = {
-        "Europe": [
-            { name: "La Masia", league: "La Liga", parentClub: "Barcelona", country: "Spain" },
-            { name: "Real Madrid Castilla", league: "La Liga", parentClub: "Real Madrid", country: "Spain" },
-            { name: "Ajax Youth", league: "Eredivisie", parentClub: "Ajax", country: "Netherlands" },
-            { name: "Benfica B", league: "Primeira Liga", parentClub: "Benfica", country: "Portugal" },
-            { name: "Cobham", league: "Premier League", parentClub: "Chelsea", country: "England" },
-            { name: "Hale End", league: "Premier League", parentClub: "Arsenal", country: "England" },
-            { name: "Clairefontaine", league: "Ligue 1", parentClub: "French National", country: "France" },
-            { name: "Sporting CP Acad", league: "Primeira Liga", parentClub: "Sporting CP", country: "Portugal" }
-        ],
-        "South America": [
-            { name: "Santos Academy", league: "Brasileirão", parentClub: "Santos", country: "Brazil" },
-            { name: "River Plate Youth", league: "Liga Profesional", parentClub: "River Plate", country: "Argentina" },
-            { name: "Flamengo Acad", league: "Brasileirão", parentClub: "Flamengo", country: "Brazil" },
-            { name: "Boca Juniors Youth", league: "Liga Profesional", parentClub: "Boca Juniors", country: "Argentina" },
-            { name: "Palmeiras Base", league: "Brasileirão", parentClub: "Palmeiras", country: "Brazil" }
-        ],
-        "Africa": [
-            { name: "Al Ahly Youth", league: "Egyptian Premier League", parentClub: "Al Ahly", country: "Egypt" },
-            { name: "Zamalek Academy", league: "Egyptian Premier League", parentClub: "Zamalek", country: "Egypt" },
-            { name: "Generation Foot", league: "Senegalese Premier League", parentClub: "Generation Foot", country: "Senegal" },
-            { name: "Mamelodi Youth", league: "South African Prem", parentClub: "Mamelodi Sundowns", country: "South Africa" },
-            { name: "ASEC Mimosas", league: "Ivorian Ligue 1", parentClub: "ASEC Mimosas", country: "Ivory Coast" }
-        ],
-        "North America": [
-            { name: "LA Galaxy Acad", league: "MLS", parentClub: "LA Galaxy", country: "USA" },
-            { name: "Pachuca Youth", league: "Liga MX", parentClub: "Pachuca", country: "Mexico" },
-            { name: "FC Dallas Acad", league: "MLS", parentClub: "FC Dallas", country: "USA" },
-            { name: "Saprissa Youth", league: "Liga Costa Rica", parentClub: "Saprissa", country: "Costa Rica" }
-        ],
-        "Asia": [
-            { name: "Al Hilal Acad", league: "Saudi Pro League", parentClub: "Al Hilal", country: "Saudi Arabia" },
-            { name: "Al Nassr Youth", league: "Saudi Pro League", parentClub: "Al Nassr", country: "Saudi Arabia" },
-            { name: "Urawa Youth", league: "J1 League", parentClub: "Urawa Reds", country: "Japan" },
-            { name: "Shandong Acad", league: "Chinese Super League", parentClub: "Shandong Taishan", country: "China" },
-            { name: "Buriram Youth", league: "Thai League 1", parentClub: "Buriram United", country: "Thailand" }
-        ],
-        "Oceania": [
-            { name: "Wellington Phoenix Acad", league: "A-League Men", parentClub: "Wellington Phoenix", country: "New Zealand" },
-            { name: "Sydney FC Youth", league: "A-League Men", parentClub: "Sydney FC", country: "Australia" },
-            { name: "Melbourne City Acad", league: "A-League Men", parentClub: "Melbourne City", country: "Australia" }
-        ]
-    };
-
-    // EXPANDED CLUBS LIST
-    const seniorTeams = {
-        "Europe": [
-            { name: "Real Madrid", league: "La Liga", strength: 95, country: "Spain" },
-            { name: "Man City", league: "Premier League", strength: 95, country: "England" },
-            { name: "Barcelona", league: "La Liga", strength: 94, country: "Spain" },
-            { name: "Bayern", league: "Bundesliga", strength: 94, country: "Germany" },
-            { name: "Liverpool", league: "Premier League", strength: 93, country: "England" },
-            { name: "PSG", league: "Ligue 1", strength: 92, country: "France" },
-            { name: "Inter", league: "Serie A", strength: 91, country: "Italy" },
-            { name: "Arsenal", league: "Premier League", strength: 90, country: "England" },
-            { name: "Milan", league: "Serie A", strength: 89, country: "Italy" },
-            { name: "Chelsea", league: "Premier League", strength: 88, country: "England" },
-            { name: "Atletico", league: "La Liga", strength: 87, country: "Spain" },
-            { name: "Dortmund", league: "Bundesliga", strength: 86, country: "Germany" },
-            { name: "Juventus", league: "Serie A", strength: 85, country: "Italy" },
-            { name: "Spurs", league: "Premier League", strength: 84, country: "England" },
-            { name: "Man Utd", league: "Premier League", strength: 83, country: "England" },
-            { name: "Newcastle", league: "Premier League", strength: 82, country: "England" },
-            { name: "Leverkusen", league: "Bundesliga", strength: 81, country: "Germany" },
-            { name: "Roma", league: "Serie A", strength: 80, country: "Italy" },
-            { name: "Sevilla", league: "La Liga", strength: 79, country: "Spain" },
-            { name: "Porto", league: "Primeira Liga", strength: 79, country: "Portugal" },
-            { name: "Leipzig", league: "Bundesliga", strength: 78, country: "Germany" },
-            { name: "Villa", league: "Premier League", strength: 77, country: "England" },
-            { name: "Napoli", league: "Serie A", strength: 76, country: "Italy" },
-            { name: "Benfica", league: "Primeira Liga", strength: 75, country: "Portugal" },
-            { name: "Marseille", league: "Ligue 1", strength: 74, country: "France" },
-            { name: "PSV", league: "Eredivisie", strength: 74, country: "Netherlands" },
-            { name: "Ajax", league: "Eredivisie", strength: 73, country: "Netherlands" },
-            { name: "Sociedad", league: "La Liga", strength: 72, country: "Spain" },
-            { name: "Wolves", league: "Premier League", strength: 72, country: "England" },
-            { name: "Monaco", league: "Ligue 1", strength: 76, country: "France" },
-            { name: "Everton", league: "Premier League", strength: 71, country: "England" },
-            { name: "West Ham", league: "Premier League", strength: 70, country: "England" },
-            { name: "Galatasaray", league: "Super Lig", strength: 68, country: "Turkey" },
-            { name: "Fenerbahce", league: "Super Lig", strength: 67, country: "Turkey" },
-            { name: "Celtic", league: "Scottish Premiership", strength: 66, country: "Scotland" },
-            { name: "Rangers", league: "Scottish Premiership", strength: 65, country: "Scotland" },
-            { name: "Lazio", league: "Serie A", strength: 77, country: "Italy" },
-            { name: "Fiorentina", league: "Serie A", strength: 75, country: "Italy" },
-            { name: "Athletic Bilbao", league: "La Liga", strength: 78, country: "Spain" },
-            { name: "Real Betis", league: "La Liga", strength: 76, country: "Spain" },
-            { name: "Lyon", league: "Ligue 1", strength: 75, country: "France" },
-            { name: "Lille", league: "Ligue 1", strength: 73, country: "France" },
-            { name: "Frankfurt", league: "Bundesliga", strength: 79, country: "Germany" },
-            { name: "Wolfsburg", league: "Bundesliga", strength: 75, country: "Germany" },
-            { name: "Brighton", league: "Premier League", strength: 76, country: "England" },
-            { name: "Crystal Palace", league: "Premier League", strength: 73, country: "England" },
-            { name: "Feyenoord", league: "Eredivisie", strength: 72, country: "Netherlands" },
-            { name: "AZ Alkmaar", league: "Eredivisie", strength: 70, country: "Netherlands" },
-            { name: "Braga", league: "Primeira Liga", strength: 73, country: "Portugal" },
-            { name: "Sporting CP", league: "Primeira Liga", strength: 76, country: "Portugal" },
-            { name: "Besiktas", league: "Super Lig", strength: 66, country: "Turkey" },
-            { name: "Trabzonspor", league: "Super Lig", strength: 65, country: "Turkey" },
-            { name: "Anderlecht", league: "Belgian Pro League", strength: 69, country: "Belgium" },
-            { name: "Club Brugge", league: "Belgian Pro League", strength: 71, country: "Belgium" },
-            // NEW CLUBS ADDED
-            { name: "Atalanta", league: "Serie A", strength: 78, country: "Italy" },
-            { name: "Bayer Leverkusen", league: "Bundesliga", strength: 80, country: "Germany" },
-            { name: "Real Sociedad", league: "La Liga", strength: 75, country: "Spain" },
-            { name: "Rennes", league: "Ligue 1", strength: 72, country: "France" },
-            { name: "West Brom", league: "Premier League", strength: 68, country: "England" },
-            { name: "Valencia", league: "La Liga", strength: 74, country: "Spain" },
-            { name: "Torino", league: "Serie A", strength: 71, country: "Italy" },
-            { name: "Hoffenheim", league: "Bundesliga", strength: 73, country: "Germany" },
-            { name: "Nice", league: "Ligue 1", strength: 71, country: "France" },
-            { name: "Fulham", league: "Premier League", strength: 69, country: "England" }
-        ],
-        "South America": [
-            { name: "Flamengo", league: "Brasileirão", strength: 84, country: "Brazil" },
-            { name: "Palmeiras", league: "Brasileirão", strength: 83, country: "Brazil" },
-            { name: "River Plate", league: "Liga Profesional", strength: 82, country: "Argentina" },
-            { name: "Boca Juniors", league: "Liga Profesional", strength: 81, country: "Argentina" },
-            { name: "Fluminense", league: "Brasileirão", strength: 80, country: "Brazil" },
-            { name: "Sao Paulo", league: "Brasileirão", strength: 79, country: "Brazil" },
-            { name: "Atlético Mineiro", league: "Brasileirão", strength: 78, country: "Brazil" },
-            { name: "Gremio", league: "Brasileirão", strength: 77, country: "Brazil" },
-            { name: "Internacional", league: "Brasileirão", strength: 76, country: "Brazil" },
-            { name: "Corinthians", league: "Brasileirão", strength: 75, country: "Brazil" },
-            { name: "Racing Club", league: "Liga Profesional", strength: 74, country: "Argentina" },
-            { name: "Independiente", league: "Liga Profesional", strength: 73, country: "Argentina" },
-            { name: "San Lorenzo", league: "Liga Profesional", strength: 72, country: "Argentina" },
-            { name: "Velez Sarsfield", league: "Liga Profesional", strength: 71, country: "Argentina" },
-            { name: "Peñarol", league: "Primera División", strength: 70, country: "Uruguay" },
-            { name: "Nacional", league: "Primera División", strength: 69, country: "Uruguay" },
-            { name: "Athletico Paranaense", league: "Brasileirão", strength: 74, country: "Brazil" },
-            { name: "Botafogo", league: "Brasileirão", strength: 73, country: "Brazil" },
-            { name: "Estudiantes", league: "Liga Profesional", strength: 70, country: "Argentina" },
-            { name: "LDU Quito", league: "Serie A Ecuador", strength: 68, country: "Ecuador" },
-            // NEW CLUBS
-            { name: "Santos", league: "Brasileirão", strength: 76, country: "Brazil" },
-            { name: "Cruzeiro", league: "Brasileirão", strength: 72, country: "Brazil" },
-            { name: "Vasco da Gama", league: "Brasileirão", strength: 71, country: "Brazil" },
-            { name: "Estudiantes LP", league: "Liga Profesional", strength: 69, country: "Argentina" },
-            { name: "Talleres", league: "Liga Profesional", strength: 68, country: "Argentina" },
-            { name: "Defensa y Justicia", league: "Liga Profesional", strength: 67, country: "Argentina" }
-        ],
-        "Africa": [
-            { name: "Al Ahly", league: "Egyptian Premier League", strength: 79, country: "Egypt" },
-            { name: "Mamelodi Sundowns", league: "South African Prem", strength: 77, country: "South Africa" },
-            { name: "Wydad Casablanca", league: "Botola Pro", strength: 75, country: "Morocco" },
-            { name: "Zamalek", league: "Egyptian Premier League", strength: 74, country: "Egypt" },
-            { name: "Raja CA", league: "Botola Pro", strength: 73, country: "Morocco" },
-            { name: "Esperance", league: "Tunisian Ligue 1", strength: 71, country: "Tunisia" },
-            { name: "TP Mazembe", league: "Linafoot", strength: 69, country: "DR Congo" },
-            { name: "Pyramids FC", league: "Egyptian Premier League", strength: 67, country: "Egypt" },
-            { name: "Kaizer Chiefs", league: "South African Prem", strength: 66, country: "South Africa" },
-            { name: "Orlando Pirates", league: "South African Prem", strength: 65, country: "South Africa" },
-            { name: "ES Tunis", league: "Tunisian Ligue 1", strength: 70, country: "Tunisia" },
-            { name: "Simba SC", league: "Tanzanian Prem", strength: 64, country: "Tanzania" },
-            { name: "Young Africans", league: "Tanzanian Prem", strength: 63, country: "Tanzania" },
-            { name: "Enyimba", league: "Nigerian Prem", strength: 62, country: "Nigeria" },
-            { name: "Kano Pillars", league: "Nigerian Prem", strength: 60, country: "Nigeria" },
-            { name: "Asante Kotoko", league: "Ghanaian Prem", strength: 61, country: "Ghana" },
-            { name: "Hearts of Oak", league: "Ghanaian Prem", strength: 60, country: "Ghana" },
-            // NEW CLUBS
-            { name: "RS Berkane", league: "Botola Pro", strength: 68, country: "Morocco" },
-            { name: "CS Sfaxien", league: "Tunisian Ligue 1", strength: 66, country: "Tunisia" },
-            { name: "Al Zamalek", league: "Egyptian Premier League", strength: 72, country: "Egypt" },
-            { name: "SuperSport United", league: "South African Prem", strength: 64, country: "South Africa" }
-        ],
-        "North America": [
-            { name: "Monterrey", league: "Liga MX", strength: 77, country: "Mexico" },
-            { name: "Tigres", league: "Liga MX", strength: 76, country: "Mexico" },
-            { name: "Club America", league: "Liga MX", strength: 75, country: "Mexico" },
-            { name: "Columbus Crew", league: "MLS", strength: 74, country: "USA" },
-            { name: "LAFC", league: "MLS", strength: 73, country: "USA" },
-            { name: "Inter Miami", league: "MLS", strength: 72, country: "USA" },
-            { name: "Seattle Sounders", league: "MLS", strength: 71, country: "USA" },
-            { name: "Toronto FC", league: "MLS", strength: 70, country: "Canada" },
-            { name: "Philadelphia Union", league: "MLS", strength: 73, country: "USA" },
-            { name: "New England Revolution", league: "MLS", strength: 71, country: "USA" },
-            { name: "Pumas", league: "Liga MX", strength: 73, country: "Mexico" },
-            { name: "Chivas", league: "Liga MX", strength: 72, country: "Mexico" },
-            { name: "Cruz Azul", league: "Liga MX", strength: 71, country: "Mexico" },
-            { name: "Atlanta United", league: "MLS", strength: 70, country: "USA" },
-            { name: "NY Red Bulls", league: "MLS", strength: 69, country: "USA" },
-            { name: "Vancouver Whitecaps", league: "MLS", strength: 68, country: "Canada" },
-            { name: "CF Montreal", league: "MLS", strength: 67, country: "Canada" },
-            { name: "Houston Dynamo", league: "MLS", strength: 68, country: "USA" },
-            { name: "Portland Timbers", league: "MLS", strength: 69, country: "USA" },
-            // NEW CLUBS
-            { name: "Leon", league: "Liga MX", strength: 74, country: "Mexico" },
-            { name: "Toluca", league: "Liga MX", strength: 70, country: "Mexico" },
-            { name: "LA Galaxy", league: "MLS", strength: 72, country: "USA" },
-            { name: "NYCFC", league: "MLS", strength: 71, country: "USA" },
-            { name: "Austin FC", league: "MLS", strength: 68, country: "USA" }
-        ],
-        "Asia": [
-            { name: "Al Hilal", league: "Saudi Pro League", strength: 81, country: "Saudi Arabia" },
-            { name: "Al Nassr", league: "Saudi Pro League", strength: 79, country: "Saudi Arabia" },
-            { name: "Al Ittihad", league: "Saudi Pro League", strength: 77, country: "Saudi Arabia" },
-            { name: "Urawa Reds", league: "J1 League", strength: 74, country: "Japan" },
-            { name: "Vissel Kobe", league: "J1 League", strength: 73, country: "Japan" },
-            { name: "Yokohama FM", league: "J1 League", strength: 72, country: "Japan" },
-            { name: "Ulsan HD", league: "K League 1", strength: 71, country: "South Korea" },
-            { name: "Jeonbuk Motors", league: "K League 1", strength: 70, country: "South Korea" },
-            { name: "Shanghai Port", league: "Chinese Super League", strength: 73, country: "China" },
-            { name: "Al-Ahli Saudi", league: "Saudi Pro League", strength: 76, country: "Saudi Arabia" },
-            { name: "Al Shabab", league: "Saudi Pro League", strength: 74, country: "Saudi Arabia" },
-            { name: "Persepolis", league: "Persian Gulf Pro League", strength: 67, country: "Iran" },
-            { name: "Esteghlal", league: "Persian Gulf Pro League", strength: 66, country: "Iran" },
-            { name: "Al-Duhail", league: "Qatar Stars League", strength: 69, country: "Qatar" },
-            { name: "Al Sadd", league: "Qatar Stars League", strength: 68, country: "Qatar" },
-            { name: "Al Ain", league: "UAE Pro League", strength: 66, country: "UAE" },
-            { name: "Shabab Al-Ahli", league: "UAE Pro League", strength: 65, country: "UAE" },
-            { name: "Kawasaki Frontale", league: "J1 League", strength: 71, country: "Japan" },
-            { name: "Cerezo Osaka", league: "J1 League", strength: 69, country: "Japan" },
-            { name: "Suwon Bluewings", league: "K League 1", strength: 68, country: "South Korea" },
-            { name: "Beijing Guoan", league: "Chinese Super League", strength: 71, country: "China" },
-            { name: "Shandong Taishan", league: "Chinese Super League", strength: 70, country: "China" },
-            // NEW CLUBS
-            { name: "Al-Ettifaq", league: "Saudi Pro League", strength: 72, country: "Saudi Arabia" },
-            { name: "Al-Taawoun", league: "Saudi Pro League", strength: 70, country: "Saudi Arabia" },
-            { name: "Gamba Osaka", league: "J1 League", strength: 68, country: "Japan" },
-            { name: "Pohang Steelers", league: "K League 1", strength: 67, country: "South Korea" },
-            { name: "Guangzhou FC", league: "Chinese Super League", strength: 69, country: "China" }
-        ],
-        "Oceania": [
-            { name: "Melbourne City", league: "A-League Men", strength: 64, country: "Australia" },
-            { name: "Sydney FC", league: "A-League Men", strength: 63, country: "Australia" },
-            { name: "Melbourne Victory", league: "A-League Men", strength: 62, country: "Australia" },
-            { name: "Western Sydney", league: "A-League Men", strength: 61, country: "Australia" },
-            { name: "Central Coast Mariners", league: "A-League Men", strength: 60, country: "Australia" },
-            { name: "Wellington Phoenix", league: "A-League Men", strength: 59, country: "New Zealand" },
-            { name: "Auckland City", league: "New Zealand Prem", strength: 58, country: "New Zealand" },
-            { name: "Brisbane Roar", league: "A-League Men", strength: 59, country: "Australia" },
-            { name: "Adelaide United", league: "A-League Men", strength: 58, country: "Australia" },
-            { name: "Perth Glory", league: "A-League Men", strength: 57, country: "Australia" },
-            // NEW CLUBS
-            { name: "Western United", league: "A-League Men", strength: 58, country: "Australia" },
-            { name: "Macarthur FC", league: "A-League Men", strength: 56, country: "Australia" },
-            { name: "Team Wellington", league: "New Zealand Prem", strength: 55, country: "New Zealand" }
-        ]
-    };
-
-    // --- TOP LEAGUES FOR PRESTIGE AWARDS ---
-    const TOP_LEAGUES = ["Premier League", "La Liga", "Bundesliga", "Serie A", "Ligue 1"];
-
-    // --- AI RIVAL PLAYERS ---
-    const rivalPlayers = [
-        { name: "Lionel Messi", club: "Inter Miami", position: "WNG", ovr: 92, goals: 28, assists: 15, score: 0 },
-        { name: "Erling Haaland", club: "Man City", position: "ST", ovr: 91, goals: 42, assists: 8, score: 0 },
-        { name: "Kylian Mbappé", club: "PSG", position: "ST", ovr: 93, goals: 38, assists: 12, score: 0 },
-        { name: "Kevin De Bruyne", club: "Man City", position: "MID", ovr: 90, goals: 12, assists: 24, score: 0 },
-        { name: "Vinicius Jr", club: "Real Madrid", position: "WNG", ovr: 89, goals: 24, assists: 18, score: 0 }
+    const propertiesTemplate = [
+      { id: "downtown", name: "Downtown Tower", price: 120000, income: 9000, prestige: 12, demand: 1.12, x: 68, y: 22 },
+      { id: "harbor", name: "Harbor Logistics Hub", price: 95000, income: 7600, prestige: 8, demand: 1.08, x: 14, y: 72 },
+      { id: "midtown", name: "Midtown Retail Block", price: 84000, income: 6300, prestige: 7, demand: 1.06, x: 45, y: 50 },
+      { id: "uptown", name: "Uptown Office Loft", price: 108000, income: 8300, prestige: 10, demand: 1.1, x: 18, y: 20 },
+      { id: "university", name: "University Campus Space", price: 90000, income: 7200, prestige: 9, demand: 1.11, x: 79, y: 60 },
+      { id: "airport", name: "Airport Service Plaza", price: 102000, income: 7900, prestige: 11, demand: 1.09, x: 52, y: 80 }
     ];
 
-    // --- PLAYER STATE ---
-    let player = {
-        name: "", age: 16, pos: "", foot: "", region: "", 
-        club: "", league: "", country: "",
-        ovr: 55, finishing: 50,
-        goals: 0, assists: 0, cs: 0, matches: 0,
-        salary: 0.1, value: 0.05,
-        honors: 0, ballondor: 0,
-        trophies: [], history: [], highestOvr: 55,
-        recentClubs: [], isYouth: true,
-        lastTransferYear: 16,
-        offeredClubs: []
-    };
+    const stockTemplates = [
+      { id: "MVX", name: "MetroVerse Exchange", price: 112, volatility: 0.11 },
+      { id: "AUR", name: "Aurora Foods", price: 67, volatility: 0.09 },
+      { id: "TRN", name: "TransitNet", price: 84, volatility: 0.13 },
+      { id: "QBX", name: "Quantum Byte", price: 146, volatility: 0.16 }
+    ];
 
-    let pendingTransfer = null;
+    const eventTemplates = [
+      { key: "boom", title: "Consumer Boom", impact: "Households are spending freely and premium demand is climbing.", econ: 10, demand: 12, traffic: 4 },
+      { key: "recession", title: "Cost-of-Living Crunch", impact: "Consumers cut back and financing tightens.", econ: -16, demand: -12, traffic: -4 },
+      { key: "festival", title: "City Festival Week", impact: "Foot traffic surges across nightlife and transport corridors.", econ: 7, demand: 14, traffic: 10 },
+      { key: "storm", title: "Storm Front", impact: "Transit slows while essential services and delivery demand jump.", econ: -3, demand: 6, traffic: 12 },
+      { key: "venture", title: "Venture Capital Wave", impact: "Investors reward growth and tech appetite is up.", econ: 8, demand: 9, traffic: 1 },
+      { key: "transit", title: "Transit Disruption", impact: "Commuters reroute and street usage intensifies.", econ: -2, demand: 8, traffic: 18 },
+      { key: "tourism", title: "Tourism Surge", impact: "Visitors flood shopping and dining districts.", econ: 6, demand: 10, traffic: 8 },
+      { key: "green", title: "Green Mobility Push", impact: "Traditional fuel demand softens while efficient operators gain goodwill.", econ: 2, demand: 4, traffic: -5 },
+      { key: "food", title: "Food Media Spotlight", impact: "Restaurant brands capture sudden attention and buzz.", econ: 4, demand: 9, traffic: 3 },
+      { key: "cyber", title: "Cybersecurity Panic", impact: "Digital firms absorb trust shocks and customers hesitate.", econ: -4, demand: -6, traffic: 0 },
+      { key: "rate", title: "Interest Rate Shift", impact: "Banking margins change fast and investment sentiment re-prices.", econ: 3, demand: 2, traffic: 0 }
+    ];
 
-    // --- CORE FUNCTIONS ---
-    function startGame() {
-        const nameInput = document.getElementById('input-name').value.trim();
-        player.name = nameInput || "";
-        player.pos = document.getElementById('input-pos').value;
-        player.foot = document.getElementById('input-foot').value;
-        player.region = document.getElementById('input-region').value;
-        
-        const acadList = academies[player.region];
-        const academy = acadList[Math.floor(Math.random() * acadList.length)];
-        player.club = academy.name;
-        player.league = academy.league;
-        player.country = academy.country;
-        
-        const posStats = {
-            'ST': { ovr: 52, finishing: 60 },
-            'WNG': { ovr: 53, finishing: 55 },
-            'MID': { ovr: 54, finishing: 48 },
-            'DEF': { ovr: 55, finishing: 42 },
-            'GK': { ovr: 55, finishing: 30 }
-        };
-        
-        Object.assign(player, posStats[player.pos]);
-        player.salary = 0.1;
-        player.value = 0.03;
-        player.isYouth = true;
-        player.lastTransferYear = 16;
-        player.offeredClubs = [];
-        
-        // Hide setup, show dashboard
-        document.getElementById('setup-screen').classList.add('hidden');
-        document.getElementById('dashboard').classList.add('visible');
-        document.getElementById('btn-play-top').style.display = 'flex';
-        
-        updateUI();
-        log(`Signed youth contract with <span class="log-highlight">${player.club}</span>.`, 'info');
-        log(`Parent club: <b>${academy.parentClub}</b>. Promotion at age 18.`, 'info');
+    const aiNames = [
+      ["Mika", "Urban Drift"], ["Nora", "Blue Summit"], ["Leo", "Falcon Ridge"], ["Iris", "Bright Harbor"]
+    ];
+
+    const ui = {};
+    const cars = [];
+    let channel;
+    let player = null;
+    let city = null;
+    let selectedType = "taxi";
+    let lastRender = 0;
+
+    function money(value) {
+      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
     }
 
-    function playSeason() {
-        if(player.age >= 40) {
-            showRetirementScreen();
-            return;
-        }
+    function percent(value) {
+      return `${Math.round(value)}%`;
+    }
 
-        const prevOvr = player.ovr;
-        player.age++;
-        
-        if (player.age === 18 && player.isYouth) {
-            promoteToParentClub();
-        }
-        
-        const league = getLeagueInfo(player.region, player.league);
-        const leagueStrength = league?.strength || 70;
-        
-        let baseMatches = player.isYouth ? 
-            Math.max(5, Math.min(25, Math.floor(8 + player.ovr * 0.15))) :
-            Math.max(15, Math.min(55, Math.floor(20 + player.ovr * 0.35 + leagueStrength * 0.1)));
-        
-        let cupMatches = 0;
-        if (!player.isYouth && Math.random() > 0.4) {
-            cupMatches = Math.floor(Math.random() * 5) + 2;
-            if (leagueStrength > 85 && player.ovr > 78 && Math.random() > 0.6) {
-                cupMatches += Math.floor(Math.random() * 8) + 4;
-            }
-        }
-        
-        const seasonMatches = Math.min(65, baseMatches + cupMatches);
-        player.matches += seasonMatches;
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
 
-        let g = 0, a = 0, cs = 0;
-        
-        const conversionRate = Math.min(0.95, 0.3 + (player.finishing / 100) * 0.5 + (player.ovr / 100) * 0.2);
-        const leagueMod = 0.7 + (leagueStrength / 100) * 0.3;
-        
-        // POSITION FORMULAS (STRIKER BUFFED)
-        const positionFormulas = {
-            'ST': () => {
-                // BUFFED STRIKER: Higher base + better finishing scaling
-                const baseGoals = seasonMatches * 0.42; // Increased from 0.38
-                const finishingBonus = (player.finishing - 50) * 0.012; // Increased from 0.008
-                const ovrBonus = (player.ovr - 50) * 0.009; // Increased from 0.006
-                const clutchBonus = player.ovr > 85 ? 0.08 : 0; // New clutch bonus for elite strikers
-                const totalRate = Math.min(1.3, 0.42 + finishingBonus + ovrBonus + clutchBonus) * leagueMod;
-                return Math.floor(seasonMatches * totalRate * conversionRate * (0.85 + Math.random() * 0.3));
-            },
-            'WNG': () => {
-                const baseGoals = seasonMatches * 0.38;
-                const finishingBonus = (player.finishing - 50) * 0.009;
-                const ovrBonus = (player.ovr - 50) * 0.007;
-                const totalRate = Math.min(1.1, 0.38 + finishingBonus + ovrBonus) * leagueMod;
-                return Math.floor(seasonMatches * totalRate * conversionRate * (0.85 + Math.random() * 0.3));
-            },
-            'MID': () => {
-                const baseGoals = seasonMatches * 0.22;
-                const ovrBonus = (player.ovr - 50) * 0.012;
-                const playmakerBonus = player.ovr > 85 ? 0.15 : 0;
-                const totalRate = Math.min(0.9, 0.22 + ovrBonus + playmakerBonus) * leagueMod;
-                return Math.floor(seasonMatches * totalRate * conversionRate * (0.85 + Math.random() * 0.3));
-            },
-            'DEF': () => Math.floor(seasonMatches * 0.06 * leagueMod * conversionRate * (0.85 + Math.random() * 0.3)),
-            'GK': () => 0
+    function randomRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function uid() {
+      return `p_${Math.random().toString(36).slice(2, 10)}`;
+    }
+
+    function defaultCity() {
+      return {
+        version: 1,
+        month: 0,
+        year: 2026,
+        economy: 100,
+        demand: 100,
+        traffic: 58,
+        estate: 100,
+        event: eventTemplates[0],
+        lastTick: Date.now(),
+        properties: propertiesTemplate.map(item => ({ ...item, ownerId: null })),
+        stocks: stockTemplates.map(item => ({ ...item, history: [item.price] })),
+        news: [
+          { id: uid(), time: "Jan 2026", text: "Metrovale opens for business. Investors and entrepreneurs pour into the city." }
+        ],
+        players: {},
+        ai: aiNames.map(([name, company], index) => ({
+          id: `ai_${index}`,
+          name,
+          company,
+          type: Object.keys(businessTypes)[index % Object.keys(businessTypes).length],
+          cash: 160000 + index * 32000,
+          worth: 250000 + index * 54000,
+          revenue: 9000 + index * 1600,
+          employees: 12 + index * 4,
+          share: 8 + index * 3,
+          level: 2 + index
+        }))
+      };
+    }
+
+    function loadCity() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) {
+        const fresh = defaultCity();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+        return fresh;
+      }
+      try {
+        return JSON.parse(saved);
+      } catch {
+        const fresh = defaultCity();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+        return fresh;
+      }
+    }
+
+    function saveCity() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(city));
+      if (channel) {
+        channel.postMessage({ type: "city-sync", city });
+      }
+    }
+
+    function savePlayer() {
+      localStorage.setItem(PLAYER_KEY, JSON.stringify(player));
+      city.players[player.id] = publicPlayerState(player);
+      saveCity();
+    }
+
+    function publicPlayerState(source) {
+      return {
+        id: source.id,
+        playerName: source.playerName,
+        companyName: source.companyName,
+        type: source.type,
+        cash: Math.round(source.cash),
+        worth: Math.round(calcWorth(source)),
+        revenue: Math.round(source.lastRevenue),
+        employees: source.employees,
+        properties: [...source.properties],
+        level: source.level,
+        share: calcShare(source)
+      };
+    }
+
+    function loadPlayer() {
+      const saved = localStorage.getItem(PLAYER_KEY);
+      if (!saved) return null;
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return null;
+      }
+    }
+
+    function createPlayer(playerName, companyName, type) {
+      const business = businessTypes[type];
+      return {
+        id: uid(),
+        playerName,
+        companyName,
+        type,
+        startedAt: Date.now(),
+        cash: business.baseCash,
+        employees: 8,
+        morale: 68,
+        efficiency: 72,
+        reputation: 55,
+        level: 1,
+        xp: 0,
+        sharesOwned: {},
+        properties: [],
+        branches: 1,
+        hqLevel: 1,
+        marketingBoost: 0,
+        trainingBoost: 0,
+        branchBonus: 0,
+        lastRevenue: 0
+      };
+    }
+
+    function levelTarget(level) {
+      return 160 + level * 120;
+    }
+
+    function calcWorth(source = player) {
+      const stockValue = Object.entries(source.sharesOwned || {}).reduce((sum, [id, amount]) => {
+        const stock = city.stocks.find(item => item.id === id);
+        return sum + ((stock?.price || 0) * amount);
+      }, 0);
+      const propertyValue = city.properties
+        .filter(item => source.properties.includes(item.id))
+        .reduce((sum, item) => sum + item.price * 1.08, 0);
+      return source.cash + stockValue + propertyValue + source.employees * 2200 + source.hqLevel * 18000 + source.branches * 14000;
+    }
+
+    function calcShare(source = player) {
+      const level = source.level || 1;
+      const branches = source.branches || 1;
+      const reputation = source.reputation ?? 56;
+      const properties = Array.isArray(source.properties) ? source.properties.length : 0;
+      const base = 4 + level * 2.2 + branches * 2.6 + reputation * 0.12 + properties * 1.8;
+      return clamp(base, 1, 48);
+    }
+
+    function computeRevenue(source = player) {
+      const profile = businessTypes[source.type];
+      const eventBoost = profile.eventBias[city.event.key] || 1;
+      const economyFactor = city.economy / 100;
+      const demandFactor = city.demand / 100;
+      const trafficFactor = 1 + ((city.traffic - 50) / 100) * profile.trafficBias;
+      const moraleFactor = 0.72 + source.morale / 100 * 0.5;
+      const efficiencyFactor = 0.7 + source.efficiency / 100 * 0.55;
+      const scale = (source.employees * 960) + (source.branches * 6200) + (source.hqLevel * 2800);
+      const propertyBonus = city.properties
+        .filter(item => source.properties.includes(item.id))
+        .reduce((sum, item) => sum + item.income * item.demand, 0);
+      const campaign = 1 + source.marketingBoost * 0.1 + source.branchBonus * 0.05;
+      const gross = scale * profile.margin * eventBoost * economyFactor * demandFactor * trafficFactor * moraleFactor * efficiencyFactor * campaign + propertyBonus;
+      const payroll = source.employees * (680 + source.hqLevel * 40);
+      const upkeep = source.branches * 1900 + source.hqLevel * 900 + source.properties.length * 550;
+      return Math.round(gross - payroll - upkeep);
+    }
+
+    function addNews(text) {
+      city.news.unshift({
+        id: uid(),
+        time: `${CITY_MONTHS[city.month]} ${city.year}`,
+        text
+      });
+      city.news = city.news.slice(0, 18);
+    }
+
+    function cityTick() {
+      const eventRoll = Math.random();
+      if (eventRoll > 0.72) {
+        city.event = eventTemplates[Math.floor(Math.random() * eventTemplates.length)];
+        addNews(`${city.event.title}: ${city.event.impact}`);
+      }
+
+      city.month += 1;
+      if (city.month > 11) {
+        city.month = 0;
+        city.year += 1;
+      }
+
+      city.economy = clamp(city.economy + city.event.econ * 0.2 + randomRange(-3, 3), 62, 146);
+      city.demand = clamp(city.demand + city.event.demand * 0.22 + randomRange(-4, 4), 60, 155);
+      city.traffic = clamp(city.traffic + city.event.traffic * 0.18 + randomRange(-5, 5), 28, 95);
+      city.estate = clamp(city.estate + (city.demand - 100) * 0.04 + randomRange(-2, 2), 78, 150);
+
+      city.stocks = city.stocks.map(stock => {
+        const drift = ((city.economy - 100) / 100) + ((city.demand - 100) / 130);
+        const swing = randomRange(-stock.volatility, stock.volatility);
+        const next = clamp(stock.price * (1 + drift * 0.08 + swing), 18, 420);
+        const history = [...stock.history, next].slice(-18);
+        return { ...stock, price: Math.round(next * 100) / 100, history };
+      });
+
+      city.ai = city.ai.map(bot => {
+        const growth = randomRange(0.96, 1.1) * (city.economy / 100);
+        const revenue = Math.round(bot.revenue * growth);
+        const worth = Math.round(bot.worth + revenue * 0.45 + randomRange(-6000, 12000));
+        return {
+          ...bot,
+          cash: Math.round(bot.cash + revenue * 0.22),
+          revenue,
+          worth: clamp(worth, 120000, 2200000),
+          employees: clamp(bot.employees + Math.round(randomRange(-1, 2)), 8, 140),
+          level: clamp(bot.level + (Math.random() > 0.78 ? 1 : 0), 2, 12),
+          share: clamp(bot.share + randomRange(-1.2, 1.5), 4, 28)
         };
-        
-        const assistFormulas = {
-            'ST': () => Math.floor(seasonMatches * 0.12 * leagueMod * (0.85 + Math.random() * 0.3)),
-            'WNG': () => Math.floor(seasonMatches * 0.30 * leagueMod * (0.85 + Math.random() * 0.3)),
-            'MID': () => {
-                const baseAssists = seasonMatches * 0.35;
-                const ovrBonus = (player.ovr - 50) * 0.008;
-                const totalRate = Math.min(1.0, 0.35 + ovrBonus) * leagueMod;
-                return Math.floor(seasonMatches * totalRate * (0.85 + Math.random() * 0.3));
-            },
-            'DEF': () => Math.floor(seasonMatches * 0.09 * leagueMod * (0.85 + Math.random() * 0.3)),
-            'GK': () => Math.floor(seasonMatches * 0.03 * (0.85 + Math.random() * 0.3))
-        };
-        
-        g = positionFormulas[player.pos]();
-        a = assistFormulas[player.pos]();
-        
-        if (player.pos === 'DEF') {
-            cs = Math.floor(seasonMatches * 0.35 * (player.ovr/100) * (0.85 + Math.random() * 0.3));
-        } else if (player.pos === 'GK') {
-            cs = Math.floor(seasonMatches * 0.42 * (player.ovr/100) * (0.85 + Math.random() * 0.3));
-        }
+      });
 
-        player.goals += g;
-        player.assists += a;
-        player.cs += cs;
+      city.lastTick = Date.now();
+      saveCity();
+    }
 
-        let growth = 0;
-        const potential = 99 - player.ovr;
-        
-        if (player.age < 23) growth = Math.floor(potential * 0.35 * (0.7 + Math.random() * 0.4));
-        else if (player.age < 29) growth = Math.floor(potential * 0.12 * (0.7 + Math.random() * 0.4));
-        else if (player.age < 33) growth = -Math.floor((player.ovr - 70) * 0.08 * (0.7 + Math.random() * 0.4));
-        else growth = -Math.floor((player.ovr - 60) * 0.15 * (0.7 + Math.random() * 0.4));
-        
-        if (Math.random() < 0.04 + (player.age - 20) * 0.004) {
-            const impact = Math.floor(1 + Math.random() * 2);
-            growth -= impact;
-            log(`<span class="log-injury"><i class="fas fa-bone"></i> INJURY:</span> Missed time. OVR -${impact}`, 'injury');
-        }
-        
-        player.ovr = Math.min(99, Math.max(40, player.ovr + growth));
-        if (player.ovr > player.highestOvr) player.highestOvr = player.ovr;
+    function maybeAdvanceCity() {
+      const fresh = loadCity();
+      city = fresh;
+      if (Date.now() - city.lastTick >= TICK_MS) {
+        cityTick();
+      }
+    }
 
-        if (player.isYouth) {
-            player.value = Math.max(0.03, Math.min(2.0, (player.ovr * player.ovr) / 400));
-            player.salary = Math.min(3, Math.max(0.1, player.ovr / 40));
-        } else {
-            const ageFactor = player.age < 24 ? 1.5 : player.age < 29 ? 1.1 : player.age < 33 ? 0.9 : 0.6;
-            player.value = Math.max(0.5, (player.ovr * player.ovr * ageFactor) / 140);
-            const wageBase = Math.pow(player.ovr, 2.0) / 180;
-            player.salary = Math.min(9999, Math.max(1, Math.floor(wageBase * (0.5 + leagueStrength/180))));
-        }
+    function playerTick() {
+      if (!player) return;
+      const revenue = computeRevenue();
+      player.lastRevenue = revenue;
+      player.cash += revenue;
+      player.morale = clamp(player.morale + randomRange(-2, 2) + player.trainingBoost * 0.35, 35, 98);
+      player.efficiency = clamp(player.efficiency + randomRange(-1.5, 1.5) + player.trainingBoost * 0.45, 40, 99);
+      player.reputation = clamp(player.reputation + randomRange(-1, 1.5) + player.marketingBoost * 0.3, 30, 99);
+      player.xp += Math.max(12, Math.round(revenue / 2200));
+      player.marketingBoost = Math.max(0, player.marketingBoost - 0.18);
+      player.trainingBoost = Math.max(0, player.trainingBoost - 0.12);
+      player.branchBonus = Math.max(0, player.branchBonus - 0.08);
 
-        const seasonHonors = [];
-        
-        if (!player.isYouth) {
-            const club = getClubInfo(player.region, player.club);
-            const clubStrength = club?.strength || 70;
-            
-            // NERFED LEAGUE TITLE CHANCE
-            if (Math.random() < (clubStrength/100) * (player.ovr/180)) {
-                player.trophies.push({name: player.league, league: player.league, count: 1});
-                seasonHonors.push(player.league);
-            }
-            
-            const domesticCup = regions[player.region]?.cups?.[player.league];
-            // NERFED CUP CHANCE
-            if (domesticCup && Math.random() < 0.08 * (clubStrength/100)) {
-                player.trophies.push({name: domesticCup, league: player.league, count: 1});
-                seasonHonors.push(domesticCup);
-            }
-            
-            // NERFED CONTINENTAL CUP
-            if (leagueStrength > 85 && Math.random() < 0.05) {
-                const contName = getContinentalName(player.region);
-                player.trophies.push({name: contName, league: contName, count: 1});
-                seasonHonors.push(contName);
-                
-                // Show UCL ceremony if won
-                if (contName === "UEFA Champions League") {
-                    showUCLCeremony(g, a);
-                }
-            }
-            
-            // Awards only in TOP LEAGUES
-            const isTopLeague = TOP_LEAGUES.includes(player.league);
-            if (isTopLeague) {
-                checkBallonDor(seasonMatches, g, a, cs, seasonHonors);
-                checkIndividualAwards(g, a, cs, seasonMatches);
-            }
-        }
-        
-        player.honors = player.trophies.length;
+      while (player.xp >= levelTarget(player.level)) {
+        player.xp -= levelTarget(player.level);
+        player.level += 1;
+        player.cash += 18000;
+        addNews(`${player.companyName} reached company level ${player.level}. Investors notice the momentum.`);
+      }
 
-        let summary = `Played <span class="stat-value">${seasonMatches}</span> matches. `;
-        summary += player.pos === 'GK' ? `${cs} Clean Sheets.` : `${g} Goals, ${a} Assists.`;
-        if(seasonHonors.length > 0) {
-            summary += ` <span class="log-trophy"><i class="fas fa-trophy"></i> Won: ${seasonHonors.join(', ')}</span>`;
-        }
-        log(`<span class="log-year">Age ${player.age}</span> ${summary}`, 'season');
-        
-        if(growth > 0) log(`Development! OVR ${prevOvr} → ${player.ovr}`, 'success');
-        else if(growth < 0) log(`Decline. OVR ${prevOvr} → ${player.ovr}`, 'warning');
+      savePlayer();
+    }
 
-        player.history.push({
-            age: player.age, club: player.club, league: player.league,
-            matches: seasonMatches, goals: g, assists: a, cleanSheets: cs,
-            trophies: [...seasonHonors], ovr: player.ovr, value: player.value, isYouth: player.isYouth
+    function hireStaff() {
+      const cost = 6000 + player.employees * 220;
+      if (player.cash < cost) return;
+      player.cash -= cost;
+      player.employees += 3;
+      player.morale = clamp(player.morale - 1 + randomRange(0, 2), 35, 99);
+      addNews(`${player.companyName} hired new staff to support expansion.`);
+      savePlayer();
+      render();
+    }
+
+    function trainStaff() {
+      const cost = 18000 + player.level * 1800;
+      if (player.cash < cost) return;
+      player.cash -= cost;
+      player.trainingBoost += 1.8;
+      player.morale = clamp(player.morale + 5, 35, 99);
+      addNews(`${player.companyName} launched a training program to improve service quality.`);
+      savePlayer();
+      render();
+    }
+
+    function runMarketing() {
+      const cost = 22000 + player.level * 2500;
+      if (player.cash < cost) return;
+      player.cash -= cost;
+      player.marketingBoost += 2.2;
+      player.reputation = clamp(player.reputation + 8, 30, 99);
+      addNews(`${player.companyName} rolled out a city-wide marketing blitz.`);
+      savePlayer();
+      render();
+    }
+
+    function upgradeHQ() {
+      const cost = 54000 * player.hqLevel;
+      if (player.cash < cost) return;
+      player.cash -= cost;
+      player.hqLevel += 1;
+      player.efficiency = clamp(player.efficiency + 7, 40, 99);
+      player.morale = clamp(player.morale + 4, 35, 99);
+      addNews(`${player.companyName} upgraded its headquarters to level ${player.hqLevel}.`);
+      savePlayer();
+      render();
+    }
+
+    function openBranch() {
+      const cost = 72000 + player.branches * 18000;
+      if (player.cash < cost) return;
+      player.cash -= cost;
+      player.branches += 1;
+      player.branchBonus += 1.2;
+      addNews(`${player.companyName} opened branch #${player.branches} to capture more market share.`);
+      savePlayer();
+      render();
+    }
+
+    function buyProperty(id) {
+      const target = city.properties.find(item => item.id === id);
+      if (!target || target.ownerId || player.cash < target.price) return;
+      player.cash -= target.price;
+      player.properties.push(id);
+      target.ownerId = player.id;
+      player.reputation = clamp(player.reputation + 5, 30, 99);
+      addNews(`${player.companyName} acquired ${target.name}.`);
+      savePlayer();
+      render();
+    }
+
+    function tradeStock(id, amount) {
+      const stock = city.stocks.find(item => item.id === id);
+      if (!stock) return;
+      const cost = stock.price * Math.abs(amount);
+      const held = player.sharesOwned[id] || 0;
+      if (amount > 0 && player.cash >= cost) {
+        player.cash -= cost;
+        player.sharesOwned[id] = held + amount;
+      } else if (amount < 0 && held >= Math.abs(amount)) {
+        player.cash += cost;
+        player.sharesOwned[id] = held + amount;
+      } else {
+        return;
+      }
+      addNews(`${player.companyName} ${amount > 0 ? "bought" : "sold"} ${Math.abs(amount)} shares of ${stock.id}.`);
+      savePlayer();
+      render();
+    }
+
+    function populateTypeGrid() {
+      const grid = document.getElementById("typeGrid");
+      grid.innerHTML = Object.entries(businessTypes).map(([key, info]) => `
+        <div class="type-card ${key === selectedType ? "active" : ""}" data-type="${key}">
+          <strong>${info.name}</strong>
+          <p class="subtle" style="font-size:0.92rem; margin-top:6px;">${info.description}</p>
+          <div class="footer-note">Starting capital: ${money(info.baseCash)}</div>
+        </div>
+      `).join("");
+
+      grid.querySelectorAll(".type-card").forEach(card => {
+        card.addEventListener("click", () => {
+          selectedType = card.dataset.type;
+          populateTypeGrid();
         });
-
-        updateUI();
-        
-        if (!player.isYouth && player.age > 18 && player.age - player.lastTransferYear >= 1) {
-            checkTransfers();
-        }
+      });
     }
 
-    function promoteToParentClub() {
-        const acadList = academies[player.region];
-        const academy = acadList.find(a => a.name === player.club);
-        
-        if (academy?.parentClub) {
-            const parentClub = seniorTeams[player.region]?.find(c => c.name === academy.parentClub);
-            
-            if (parentClub) {
-                player.club = parentClub.name;
-                player.league = parentClub.league;
-                player.country = parentClub.country;
-                player.isYouth = false;
-                
-                const ageFactor = player.age < 24 ? 1.5 : player.age < 29 ? 1.1 : player.age < 33 ? 0.9 : 0.6;
-                const seniorValue = Math.max(0.5, (player.ovr * player.ovr * ageFactor) / 140);
-                
-                const league = getLeagueInfo(player.region, player.league);
-                const leagueStrength = league?.strength || 70;
-                const wageBase = Math.pow(player.ovr, 2.0) / 180;
-                const seniorWage = Math.min(9999, Math.max(1, Math.floor(wageBase * (0.5 + leagueStrength/180))));
-                
-                player.value = player.value * 0.7 + seniorValue * 0.3;
-                player.salary = player.salary * 0.8 + seniorWage * 0.2;
-                
-                const formattedWage = player.salary.toFixed(1);
-                const formattedValue = player.value.toFixed(2);
-                
-                log(`<span class="log-transfer"><i class="fas fa-arrow-up"></i> PROMOTION:</span> Moved to <b>${player.club}</b>!`, 'transfer');
-                log(`Wage: €${formattedWage}K/week | Value: €${formattedValue}M`, 'info');
-                updateUI();
-                return;
-            }
-        }
-        
-        const fallbackClub = seniorTeams[player.region]?.find(c => c.league === player.league);
-        if (fallbackClub) {
-            player.club = fallbackClub.name;
-            player.league = fallbackClub.league;
-            player.country = fallbackClub.country;
-            player.isYouth = false;
-            player.salary = Math.max(1, Math.floor(player.ovr / 10));
-            player.value = Math.max(0.3, (player.ovr * player.ovr) / 300);
-            log(`<span class="log-transfer"><i class="fas fa-arrow-up"></i> PROMOTION:</span> Moved to <b>${player.club}</b>!`, 'transfer');
-            updateUI();
-            return;
-        }
-
-        const anyClub = seniorTeams[player.region]?.[0];
-        if (anyClub) {
-            player.club = anyClub.name;
-            player.league = anyClub.league;
-            player.country = anyClub.country;
-            player.isYouth = false;
-            player.salary = Math.max(1, Math.floor(player.ovr / 10));
-            player.value = Math.max(0.3, (player.ovr * player.ovr) / 300);
-            log(`<span class="log-transfer"><i class="fas fa-arrow-up"></i> PROMOTION:</span> Moved to <b>${player.club}</b>!`, 'transfer');
-            updateUI();
-        }
+    function setupUiRefs() {
+      [
+        "companyTitle", "headline", "eventTitle", "eventImpact", "cashValue", "revenueValue", "worthValue",
+        "employeesValue", "shareValue", "trafficValue", "citySignals", "demandMetric", "estateMetric",
+        "economyMetric", "dateMetric", "businessTag", "businessStats", "properties", "employeesPanel",
+        "leaderboard", "newsFeed", "moraleTag", "stocks", "cityView", "sessionPill"
+      ].forEach(id => { ui[id] = document.getElementById(id); });
     }
 
-    // --- INDIVIDUAL AWARDS (NO CEREMONIES) ---
-    function checkIndividualAwards(goals, assists, cleanSheets, matches) {
-        if (player.isYouth || matches < 25) return;
-        if (!TOP_LEAGUES.includes(player.league)) return;
+    function createCityDistricts() {
+      ui.cityView.querySelectorAll(".district, .car").forEach(node => node.remove());
+      cars.length = 0;
 
-        let awardWon = null;
-
-        // Golden Boot (Top Scorer)
-        if (player.pos !== 'GK' && player.pos !== 'DEF') {
-            const threshold = 35;
-            if (goals >= threshold) {
-                awardWon = { 
-                    name: "Golden Boot", 
-                    icon: "fa-shoe-prints", 
-                    desc: "Top Scorer",
-                    color: "#FFD60A",
-                    quote: `"A lethal finisher. The league's most feared striker."`
-                };
-            }
-        }
-
-        // Playmaker (Top Assists)
-        if (player.pos !== 'GK') {
-            const threshold = 20;
-            if (assists >= threshold) {
-                if (!awardWon || assists > 25) {
-                    awardWon = { 
-                        name: "Playmaker Award", 
-                        icon: "fa-wand-magic-sparkles", 
-                        desc: "Most Assists",
-                        color: "#BF5AF2",
-                        quote: `"The maestro. Every pass a work of art."`
-                    };
-                }
-            }
-        }
-
-        // Golden Glove (Best GK)
-        if (player.pos === 'GK') {
-            const threshold = 22;
-            if (cleanSheets >= threshold) {
-                awardWon = { 
-                    name: "Golden Glove", 
-                    icon: "fa-hand-sparkles", 
-                    desc: "Best Goalkeeper",
-                    color: "#30D158",
-                    quote: `"Unbeatable between the posts. A wall for his team."`
-                };
-            }
-        }
-
-        if (awardWon) {
-            log(`<span class="log-award"><i class="fas ${awardWon.icon}"></i> AWARD:</span> You won the <b>${awardWon.name}</b>!`, 'award');
-            player.trophies.push({name: awardWon.name, league: "Individual", count: 1});
-            player.honors = player.trophies.length;
-            // No ceremony for these awards anymore
-        }
-    }
-
-    // --- BALLON D'OR WITH RIVALS & CEREMONY ---
-    function checkBallonDor(matches, goals, assists, cleanSheets, honors) {
-        if (player.age < 19 || matches < 30) return;
-        if (!TOP_LEAGUES.includes(player.league)) return;
-        
-        let score = 0;
-        
-        if (player.pos === 'DEF') {
-            score = cleanSheets * 3.0 + player.ovr * 3.5 + assists * 1.5;
-            if (honors.some(h => TOP_LEAGUES.includes(h))) score += 120;
-            if (honors.includes("UEFA Champions League")) score += 220;
-        } else {
-            score = goals * 2.5 + assists * 1.8 + player.ovr * 3.5;
-            if (honors.some(h => TOP_LEAGUES.includes(h))) score += 100;
-            if (honors.includes("UEFA Champions League")) score += 200;
-        }
-        
-        const league = getLeagueInfo(player.region, player.league);
-        if (league?.strength > 85) score += 50;
-        
-        // Calculate rival scores
-        rivalPlayers.forEach(rival => {
-            // Rivals get random performance variation
-            const performance = 0.8 + Math.random() * 0.4;
-            rival.score = (rival.goals * 2.2 + rival.assists * 1.5 + rival.ovr * 3.2) * performance;
-            if (rival.club.includes("Real Madrid") || rival.club.includes("Man City")) {
-                rival.score += 80; // Club bonus for top teams
-            }
-        });
-        
-        // Sort rivals by score
-        const sortedRivals = [...rivalPlayers].sort((a, b) => b.score - a.score);
-        const topRival = sortedRivals[0];
-        
-        // Check if player wins or it's a draw
-        const isDraw = Math.abs(score - topRival.score) < 30 && Math.random() > 0.6;
-        
-        if (score > 600 && (score > topRival.score || isDraw)) {
-            player.ballondor++;
-            
-            // Show enhanced ceremony with rivals
-            showBallonDorCeremony(goals, assists, isDraw ? sortedRivals.slice(0, 3) : []);
-            
-            log(`<span class="log-ceremony"><i class="fas fa-crown"></i> CEREMONY:</span> <span class="log-ballondor">BALLON D'OR WINNER!</span>`, 'ballondor');
-            player.trophies.push({name: "Ballon d'Or", league: "International", count: 1});
-        }
-    }
-
-    // --- ENHANCED BALLON D'OR CEREMONY WITH RIVALS ---
-    function showBallonDorCeremony(goals, assists, rivals) {
-        document.getElementById('ceremony-icon').className = 'fas fa-trophy';
-        document.getElementById('ceremony-title').textContent = 'BALLON D\'OR';
-        document.getElementById('ceremony-player').textContent = player.name;
-        document.getElementById('ceremony-season').textContent = `Age ${player.age} • ${player.league}`;
-        document.getElementById('ceremony-goals').textContent = goals;
-        document.getElementById('ceremony-assists').textContent = assists;
-        document.getElementById('ceremony-ovr').textContent = player.ovr;
-        document.getElementById('ceremony-quote').textContent = `"The world's best player. A true legend of the game."`;
-        
-        // Show/hide rivals section
-        const rivalsSection = document.getElementById('rivals-section');
-        const rivalsList = document.getElementById('rivals-list');
-        
-        if (rivals.length > 0) {
-            rivalsSection.style.display = 'block';
-            rivalsList.innerHTML = '';
-            
-            rivals.forEach((rival, index) => {
-                const rivalCard = document.createElement('div');
-                rivalCard.className = 'rival-card';
-                rivalCard.innerHTML = `
-                    <div class="rival-avatar">${rival.name.charAt(0)}</div>
-                    <div class="rival-info">
-                        <div class="rival-name">${rival.name}</div>
-                        <div class="rival-club">${rival.club}</div>
-                    </div>
-                    <div class="rival-score">${Math.round(rival.score)}</div>
-                `;
-                rivalsList.appendChild(rivalCard);
-            });
-        } else {
-            rivalsSection.style.display = 'none';
-        }
-        
-        const modalContent = document.querySelector('#ceremony-modal .modal-content');
-        modalContent.style.borderColor = '#FFD60A';
-        modalContent.style.boxShadow = '0 0 40px rgba(255,214,10,0.4), 0 20px 60px rgba(0,0,0,0.8)';
-        
-        document.getElementById('ceremony-modal').style.display = 'flex';
-        
-        // Enhanced confetti for Ballon d'Or
-        createEnhancedConfetti('#FFD60A', true);
-    }
-
-    // --- UCL CEREMONY ---
-    function showUCLCeremony(goals, assists) {
-        document.getElementById('ucl-player').textContent = player.name;
-        document.getElementById('ucl-season').textContent = `Age ${player.age} • ${player.club}`;
-        document.getElementById('ucl-goals').textContent = goals;
-        document.getElementById('ucl-assists').textContent = assists;
-        document.getElementById('ucl-ovr').textContent = player.ovr;
-        
-        document.getElementById('ucl-ceremony-modal').style.display = 'flex';
-        
-        // Create UCL-themed confetti
-        createUCLConfetti();
-    }
-
-    function createEnhancedConfetti(color, isBallonDor = false) {
-        const colors = isBallonDor ? 
-            ['#FFD60A', '#FFB300', '#FF8F00', '#FF6D00'] : 
-            [color, `${color}cc`, `${color}99`, '#FFFFFF'];
-        
-        const count = isBallonDor ? 100 : 50;
-        
-        for (let i = 0; i < count; i++) {
-            setTimeout(() => {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDuration = (2.5 + Math.random() * 2) + 's';
-                confetti.style.width = (4 + Math.random() * 8) + 'px';
-                confetti.style.height = confetti.style.width;
-                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-                
-                // Add sparkle effect for Ballon d'Or
-                if (isBallonDor && Math.random() > 0.7) {
-                    confetti.style.boxShadow = '0 0 10px rgba(255,214,10,0.8)';
-                    confetti.style.animationDuration = (3 + Math.random() * 2) + 's';
-                }
-                
-                document.body.appendChild(confetti);
-                
-                // Remove after animation
-                setTimeout(() => confetti.remove(), 4000);
-            }, i * (isBallonDor ? 30 : 50));
-        }
-    }
-
-    function createUCLConfetti() {
-        const colors = ['#00529B', '#003366', '#FFFFFF', '#0088CC'];
-        
-        for (let i = 0; i < 75; i++) {
-            setTimeout(() => {
-                const confetti = document.createElement('div');
-                confetti.className = 'ucl-confetti';
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDuration = (2.5 + Math.random() * 2) + 's';
-                confetti.style.width = (4 + Math.random() * 8) + 'px';
-                confetti.style.height = confetti.style.width;
-                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-                
-                // Add star effect for UCL
-                if (Math.random() > 0.8) {
-                    confetti.style.boxShadow = '0 0 10px rgba(0, 82, 155, 0.8)';
-                    confetti.style.animationDuration = (3 + Math.random() * 2) + 's';
-                }
-                
-                document.body.appendChild(confetti);
-                
-                // Remove after animation
-                setTimeout(() => confetti.remove(), 4000);
-            }, i * 40);
-        }
-    }
-
-    function closeCeremony() {
-        document.getElementById('ceremony-modal').style.display = 'none';
-        // Remove any remaining confetti
-        document.querySelectorAll('.confetti').forEach(c => c.remove());
-    }
-
-    function closeUCLCeremony() {
-        document.getElementById('ucl-ceremony-modal').style.display = 'none';
-        // Remove any remaining UCL confetti
-        document.querySelectorAll('.ucl-confetti').forEach(c => c.remove());
-    }
-
-    // --- RETIREMENT SCREEN ---
-    function showRetirementScreen() {
-        document.getElementById('retire-age').textContent = player.age;
-        document.getElementById('retire-peak').textContent = player.highestOvr;
-        document.getElementById('retire-goals').textContent = player.goals;
-        document.getElementById('retire-assists').textContent = player.assists;
-        document.getElementById('retire-trophies').textContent = player.trophies.length;
-        document.getElementById('retire-ballondor').textContent = player.ballondor;
-        
-        document.getElementById('retirement-modal').style.display = 'flex';
-        document.getElementById('btn-play-top').disabled = true;
-    }
-
-    function hideRetirement() {
-        document.getElementById('retirement-modal').style.display = 'none';
-    }
-
-    function restartGame() {
-        // Reset player state
-        player = {
-            name: "", age: 16, pos: "", foot: "", region: "", 
-            club: "", league: "", country: "",
-            ovr: 55, finishing: 50,
-            goals: 0, assists: 0, cs: 0, matches: 0,
-            salary: 0.1, value: 0.05,
-            honors: 0, ballondor: 0,
-            trophies: [], history: [], highestOvr: 55,
-            recentClubs: [], isYouth: true,
-            lastTransferYear: 16,
-            offeredClubs: []
-        };
-        pendingTransfer = null;
-        
-        // Reset UI
-        document.getElementById('retirement-modal').style.display = 'none';
-        document.getElementById('dashboard').classList.remove('visible');
-        document.getElementById('setup-screen').classList.remove('hidden');
-        document.getElementById('btn-play-top').style.display = 'none';
-        document.getElementById('btn-play-top').disabled = false;
-        
-        // Clear log
-        document.getElementById('log-feed').innerHTML = `
-            <div class="log-item"><div class="log-year">INFO</div><div>Welcome. Press PLAY to start.</div></div>
+      city.properties.forEach(item => {
+        const div = document.createElement("div");
+        div.className = `district ${item.ownerId === player.id ? "owned" : ""}`;
+        div.style.left = `${item.x}%`;
+        div.style.top = `${item.y}%`;
+        div.style.transform = "translate(-50%, -50%)";
+        div.innerHTML = `
+          <strong>${item.name}</strong>
+          <small>${item.ownerId === player.id ? "Owned by you" : item.ownerId ? "Owned by rival" : "Available"} - Yield ${money(item.income)}</small>
         `;
-        
-        // Focus name input
-        document.getElementById('input-name').focus();
-    }
+        ui.cityView.appendChild(div);
+      });
 
-    function checkTransfers() {
-        if (player.age > 36) return;
-        
-        let chance = 0.15;
-        if (player.age < 24 && player.ovr > 72) chance = 0.35;
-        if (player.ovr > 83) chance = 0.45;
-        if (player.ovr > 90) chance = 0.30;
-        
-        if (Math.random() < chance) {
-            let candidates = [...seniorTeams[player.region]];
-            
-            if (player.ovr > 88 && Math.random() > 0.5) {
-                candidates = [...seniorTeams["Europe"]];
-            }
-            
-            candidates = candidates.filter(c => 
-                c.name !== player.club && 
-                !player.recentClubs.includes(c.name) &&
-                !player.offeredClubs.includes(c.name)
-            );
-            
-            if (candidates.length === 0) return;
-            
-            candidates.sort((a, b) => b.strength - a.strength);
-            
-            let pickIndex;
-            if (player.ovr > 90) pickIndex = Math.floor(Math.random() * 3);
-            else if (player.ovr > 84) pickIndex = Math.floor(Math.random() * 6);
-            else pickIndex = Math.floor(Math.random() * Math.min(12, candidates.length));
-            
-            const offerClub = candidates[pickIndex];
-            
-            const fee = (player.value * (0.9 + Math.random() * 0.2)).toFixed(1);
-            const wage = Math.floor(player.salary * (1.15 + Math.random() * 0.9));
-            
-            pendingTransfer = {
-                club: offerClub.name, league: offerClub.league, country: offerClub.country,
-                fee: fee, wage: wage, strength: offerClub.strength
-            };
-            
-            if (!player.offeredClubs.includes(offerClub.name)) {
-                player.offeredClubs.push(offerClub.name);
-                if (player.offeredClubs.length > 10) player.offeredClubs.shift();
-            }
-            
-            document.getElementById('modal-club-name').textContent = offerClub.name;
-            document.getElementById('modal-club-league').textContent = `${offerClub.league} (${offerClub.country})`;
-            document.getElementById('modal-fee').textContent = fee;
-            document.getElementById('modal-wage').textContent = wage;
-            document.getElementById('modal-club-logo').textContent = offerClub.name.charAt(0);
-            
-            let pitch = `Join <b>${offerClub.name}</b> in the ${offerClub.league}!`;
-            if (offerClub.strength > 88) pitch += " Compete for the Champions League.";
-            else if (offerClub.strength > 78) pitch += " Become a key player.";
-            else pitch += " Develop your skills.";
-            
-            document.getElementById('transfer-text').innerHTML = pitch;
-            document.getElementById('transfer-modal').style.display = 'flex';
-        }
-    }
-
-    function handleTransfer(accepted) {
-        document.getElementById('transfer-modal').style.display = 'none';
-        
-        if (accepted && pendingTransfer) {
-            log(`<span class="log-transfer"><i class="fas fa-exchange-alt"></i> TRANSFER:</span> Moved to <b>${pendingTransfer.club}</b> for €${pendingTransfer.fee}M!`, 'transfer');
-            
-            player.club = pendingTransfer.club;
-            player.league = pendingTransfer.league;
-            player.country = pendingTransfer.country;
-            player.salary = pendingTransfer.wage;
-            player.lastTransferYear = player.age;
-            
-            if (player.recentClubs.length >= 3) player.recentClubs.shift();
-            player.recentClubs.push(player.club);
-            
-            player.offeredClubs = [];
-            
-            const currentLeague = getLeagueInfo(player.region, player.league);
-            if (pendingTransfer.strength > (currentLeague?.strength || 70)) {
-                player.ovr = Math.min(99, player.ovr + 1);
-                log(`New challenge boosted development! OVR → ${player.ovr}`, 'success');
-            }
-            
-            updateUI();
-        }
-        pendingTransfer = null;
-    }
-
-    function updateUI() {
-        document.getElementById('disp-name').innerHTML = `${player.name} <span style="font-size:1.25rem;color:var(--text-muted)">#10</span>`;
-        document.getElementById('disp-club').innerHTML = `<i class="fas fa-building"></i> ${player.club}`;
-        document.getElementById('disp-region').innerHTML = `<i class="fas fa-globe"></i> ${player.region}`;
-        document.getElementById('disp-pos').innerHTML = `<i class="fas fa-shoe-prints"></i> ${getPositionName(player.pos)}`;
-        document.getElementById('disp-age').textContent = player.age;
-        document.getElementById('disp-ovr').textContent = player.ovr;
-        document.getElementById('disp-value').textContent = `€${player.value.toFixed(2)}M`;
-        document.getElementById('disp-honors').textContent = player.honors;
-
-        document.getElementById('stat-matches').textContent = player.matches;
-        document.getElementById('stat-goals').textContent = player.goals;
-        document.getElementById('stat-assists').textContent = player.assists;
-        document.getElementById('stat-cs').textContent = player.cs;
-        document.getElementById('stat-salary').textContent = `€${player.salary}K`;
-        document.getElementById('stat-finish').textContent = player.finishing;
-
-        document.getElementById('stat-career-matches').textContent = player.matches;
-        document.getElementById('stat-career-goals').textContent = player.goals;
-        document.getElementById('stat-career-assists').textContent = player.assists;
-        document.getElementById('stat-career-cs').textContent = player.cs;
-        document.getElementById('stat-highest-ovr').textContent = player.highestOvr;
-        document.getElementById('stat-gpm').textContent = player.matches > 0 ? (player.goals/player.matches).toFixed(2) : '0.00';
-
-        if (player.pos === 'GK') {
-            document.getElementById('lbl-goals').textContent = "Saves";
-            document.getElementById('stat-goals').textContent = "-";
-            document.getElementById('lbl-assists').textContent = "Rating";
-            document.getElementById('stat-assists').textContent = (player.ovr/10).toFixed(1);
-        } else if (player.pos === 'DEF') {
-            document.getElementById('lbl-assists').textContent = "Tackles";
-            document.getElementById('stat-assists').textContent = Math.floor(player.cs * 1.6);
-        }
-
-        const trophyContainer = document.getElementById('trophy-list');
-        trophyContainer.innerHTML = "";
-        
-        const counts = {};
-        player.trophies.forEach(t => {
-            const key = `${t.name}|${t.league}`;
-            if (!counts[key]) counts[key] = { ...t, count: 0 };
-            counts[key].count++;
+      for (let i = 0; i < 9; i += 1) {
+        const car = document.createElement("div");
+        car.className = "car";
+        ui.cityView.appendChild(car);
+        cars.push({
+          node: car,
+          axis: i % 2 === 0 ? "x" : "y",
+          base: i % 2 === 0 ? 20 + (i % 4) * 27 : 23 + (i % 3) * 27,
+          progress: Math.random()
         });
+      }
+    }
 
-        if (Object.keys(counts).length === 0) {
-            trophyContainer.innerHTML = `
-                <div class="trophy-item">
-                    <div class="trophy-icon" style="color:var(--text-muted)"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="trophy-details">
-                        <div class="trophy-name">Youth Dev</div>
-                        <div class="trophy-count">Academy</div>
-                    </div>
-                </div>`;
+    function updateCars(timestamp) {
+      const speed = 0.00003 * city.traffic;
+      cars.forEach((car, index) => {
+        car.progress = (car.progress + speed * (timestamp - lastRender) * (1 + index * 0.04)) % 1;
+        if (car.axis === "x") {
+          car.node.style.top = `${car.base}%`;
+          car.node.style.left = `${car.progress * 100}%`;
         } else {
-            const sorted = Object.values(counts).sort((a, b) => {
-                const prestige = { "Ballon d'Or": 100, "UEFA Champions League": 90, "Copa Libertadores": 85, "Golden Boot": 80, "Playmaker Award": 75, "Golden Glove": 75 };
-                return (prestige[b.name] || b.count*10) - (prestige[a.name] || a.count*10);
-            });
-            
-            sorted.forEach(t => {
-                let iconClass = 'fa-trophy';
-                let color = 'var(--success)';
-                
-                if (t.name.includes('Ballon')) { iconClass = 'fa-award'; color = 'var(--warning)'; }
-                else if (t.name.includes('Boot')) { iconClass = 'fa-shoe-prints'; color = 'var(--primary)'; }
-                else if (t.name.includes('Playmaker')) { iconClass = 'fa-wand-magic-sparkles'; color = 'var(--secondary)'; }
-                else if (t.name.includes('Glove')) { iconClass = 'fa-hand-sparkles'; color = 'var(--text-main)'; }
-
-                trophyContainer.innerHTML += `
-                    <div class="trophy-item">
-                        <div class="trophy-icon" style="color:${color}">
-                            <i class="fas ${iconClass}"></i>
-                        </div>
-                        <div class="trophy-details">
-                            <div class="trophy-name">${t.name}</div>
-                            <div class="trophy-count">${t.count}x ${t.count>1?'Wins':'Win'}</div>
-                            <div class="trophy-league">${t.league}</div>
-                        </div>
-                    </div>`;
-            });
+          car.node.style.left = `${car.base}%`;
+          car.node.style.top = `${car.progress * 100}%`;
+          car.node.style.transform = "rotate(90deg)";
         }
-        
-        document.getElementById('total-trophies').textContent = 
-            `${player.trophies.length} ${player.trophies.length===1?'Item':'Items'}`;
+      });
+      lastRender = timestamp;
+      requestAnimationFrame(updateCars);
     }
 
-    function getLeagueInfo(region, leagueName) {
-        return regions[region]?.leagues?.find(l => l.name === leagueName) || null;
+    function renderBusinessStats() {
+      const type = businessTypes[player.type];
+      const revenue = computeRevenue();
+      const target = levelTarget(player.level);
+      ui.businessTag.textContent = type.name;
+      ui.businessStats.innerHTML = `
+        <div class="list-card">
+          <div class="row">
+            <div class="stack">
+              <strong>Growth Level ${player.level}</strong>
+              <span class="subtle">XP ${player.xp} / ${target}</span>
+            </div>
+            <div class="tag">HQ Level ${player.hqLevel}</div>
+          </div>
+          <div class="progress"><span style="width:${(player.xp / target) * 100}%;"></span></div>
+        </div>
+        <div class="list-card">
+          <div class="row">
+            <div class="stack">
+              <strong>Operational Strength</strong>
+              <span class="subtle">Efficiency ${percent(player.efficiency)} - Reputation ${percent(player.reputation)}</span>
+            </div>
+            <div class="${revenue >= 0 ? "delta-up" : "delta-down"}">${money(revenue)}</div>
+          </div>
+        </div>
+        <div class="list-card">
+          <div class="row">
+            <div class="stack">
+              <strong>Expansion Footprint</strong>
+              <span class="subtle">${player.branches} branches - ${player.properties.length} properties - ${type.staffMix.join(" / ")}</span>
+            </div>
+            <div class="tag">Share ${percent(calcShare())}</div>
+          </div>
+        </div>
+      `;
     }
 
-    function getClubInfo(region, clubName) {
-        return seniorTeams[region]?.find(c => c.name === clubName) || null;
+    function renderProperties() {
+      ui.properties.innerHTML = city.properties.map(item => {
+        const ownerName = item.ownerId === player.id
+          ? "You"
+          : city.players[item.ownerId]?.companyName || (city.ai.find(bot => bot.id === item.ownerId)?.company) || "Open Market";
+        const canBuy = !item.ownerId && player.cash >= item.price;
+        return `
+          <div class="list-card">
+            <div class="row">
+              <div class="stack">
+                <strong>${item.name}</strong>
+                <span class="subtle">Yield ${money(item.income)} - Prestige +${item.prestige} - Owner: ${ownerName}</span>
+              </div>
+              <button class="btn mini ${canBuy ? "" : "alt"}" data-buy="${item.id}" ${canBuy ? "" : "disabled"}>${item.ownerId ? "Taken" : `Buy ${money(item.price)}`}</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      ui.properties.querySelectorAll("[data-buy]").forEach(btn => {
+        btn.addEventListener("click", () => buyProperty(btn.dataset.buy));
+      });
     }
 
-    function getContinentalName(region) {
-        const map = {
-            "Europe": "UEFA Champions League",
-            "South America": "Copa Libertadores",
-            "Africa": "CAF Champions League",
-            "North America": "CONCACAF Champions Cup",
-            "Asia": "AFC Champions League",
-            "Oceania": "OFC Champions League"
-        };
-        return map[region] || "Continental Cup";
+    function renderEmployees() {
+      ui.moraleTag.textContent = `Morale ${percent(player.morale)}`;
+      ui.employeesPanel.innerHTML = `
+        <div class="list-card">
+          <div class="row">
+            <div class="stack">
+              <strong>Team Size</strong>
+              <span class="subtle">${player.employees} employees across ${player.branches} operating locations</span>
+            </div>
+            <div class="tag">${businessTypes[player.type].staffMix[0]}</div>
+          </div>
+        </div>
+        <div class="list-card">
+          <div class="label">Employee Satisfaction</div>
+          <div class="progress"><span style="width:${player.morale}%;"></span></div>
+        </div>
+        <div class="list-card">
+          <div class="label">Execution Quality</div>
+          <div class="progress"><span style="width:${player.efficiency}%;"></span></div>
+        </div>
+      `;
     }
 
-    function getPositionName(pos) {
-        return { 'ST':'Striker', 'WNG':'Winger', 'MID':'Midfielder', 'DEF':'Defender', 'GK':'Goalkeeper' }[pos] || pos;
+    function renderStocks() {
+      ui.stocks.innerHTML = city.stocks.map(stock => {
+        const held = player.sharesOwned[stock.id] || 0;
+        const change = stock.history.length > 1 ? stock.price - stock.history[stock.history.length - 2] : 0;
+        return `
+          <div class="list-card">
+            <div class="row">
+              <div class="stack">
+                <strong>${stock.id} - ${stock.name}</strong>
+                <span class="subtle">Held: ${held} shares</span>
+              </div>
+              <div class="${change >= 0 ? "delta-up" : "delta-down"}">${money(stock.price)} ${change >= 0 ? "up" : "down"}</div>
+            </div>
+            <div class="stock-line">
+              <div class="subtle">Volatility ${(stock.volatility * 100).toFixed(0)}%</div>
+              <button class="btn mini alt" data-stock="${stock.id}" data-amount="-5" ${held < 5 ? "disabled" : ""}>Sell 5</button>
+              <button class="btn mini" data-stock="${stock.id}" data-amount="5" ${player.cash < stock.price * 5 ? "disabled" : ""}>Buy 5</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      ui.stocks.querySelectorAll("[data-stock]").forEach(btn => {
+        btn.addEventListener("click", () => tradeStock(btn.dataset.stock, Number(btn.dataset.amount)));
+      });
     }
 
-    function log(msg, type='info') {
-        const feed = document.getElementById('log-feed');
-        const div = document.createElement('div');
-        div.className = 'log-item';
-        
-        const icons = {
-            success: '<i class="fas fa-star"></i> ',
-            warning: '<i class="fas fa-exclamation-triangle"></i> ',
-            error: '<i class="fas fa-exclamation-circle"></i> ',
-            injury: '<i class="fas fa-bone"></i> ',
-            transfer: '<i class="fas fa-exchange-alt"></i> ',
-            season: '<i class="fas fa-calendar-alt"></i> ',
-            ballondor: '<i class="fas fa-award"></i> ',
-            award: '<i class="fas fa-medal"></i> ',
-            ceremony: '<i class="fas fa-crown"></i> '
-        };
-        
-        div.innerHTML = `<div class="log-year">Age ${player.age}</div> ${icons[type]||''}${msg}`;
-        feed.prepend(div);
-        feed.scrollTop = 0;
+    function renderLeaderboard() {
+      const livePlayers = Object.values(city.players);
+      const all = [
+        ...livePlayers.map(item => ({
+          label: item.companyName,
+          owner: item.playerName,
+          worth: item.worth,
+          share: item.share
+        })),
+        ...city.ai.map(item => ({
+          label: item.company,
+          owner: item.name,
+          worth: item.worth,
+          share: item.share
+        }))
+      ].sort((a, b) => b.worth - a.worth).slice(0, 8);
+
+      ui.leaderboard.innerHTML = all.map((item, index) => `
+        <div class="leaderboard-entry">
+          <strong>#${index + 1}</strong>
+          <div class="stack">
+            <strong>${item.label}</strong>
+            <span class="subtle">${item.owner} - Market share ${percent(item.share)}</span>
+          </div>
+          <strong>${money(item.worth)}</strong>
+        </div>
+      `).join("");
     }
 
-    function showChangelog() {
-        document.getElementById('changelog-modal').style.display = 'flex';
+    function renderNews() {
+      ui.newsFeed.innerHTML = city.news.map(item => `
+        <div class="feed-item">
+          <div class="label">${item.time}</div>
+          <div>${item.text}</div>
+        </div>
+      `).join("");
     }
-    
-    function hideChangelog() {
-        document.getElementById('changelog-modal').style.display = 'none';
-    }
-    
-    window.onclick = function(event) {
-        const modals = ['transfer-modal', 'changelog-modal', 'retirement-modal', 'ceremony-modal', 'ucl-ceremony-modal'];
-        modals.forEach(id => {
-            const modal = document.getElementById(id);
-            if (event.target === modal) {
-                modal.style.display = 'none';
-                if (id === 'ceremony-modal') {
-                    document.querySelectorAll('.confetti').forEach(c => c.remove());
-                } else if (id === 'ucl-ceremony-modal') {
-                    document.querySelectorAll('.ucl-confetti').forEach(c => c.remove());
-                }
-            }
-        });
-    };
 
-    // Handle window resize to ensure layout stays consistent
-    window.addEventListener('resize', () => {
-        // Force reflow to fix any layout glitches
-        if (document.getElementById('dashboard').classList.contains('visible')) {
-            const dashboard = document.getElementById('dashboard');
-            dashboard.style.display = 'none';
-            setTimeout(() => {
-                dashboard.style.display = '';
-            }, 10);
+    function renderHeader() {
+      ui.companyTitle.textContent = `${player.companyName} - ${businessTypes[player.type].name}`;
+      ui.headline.textContent = `${player.playerName} is building a ${businessTypes[player.type].name.toLowerCase()} in Metrovale. Expand, invest, and outmaneuver competitors in one shared city economy.`;
+      ui.eventTitle.textContent = city.event.title;
+      ui.eventImpact.textContent = city.event.impact;
+      ui.cashValue.textContent = money(player.cash);
+      ui.revenueValue.textContent = money(player.lastRevenue);
+      ui.worthValue.textContent = money(calcWorth());
+      ui.employeesValue.textContent = player.employees;
+      ui.shareValue.textContent = percent(calcShare());
+      ui.trafficValue.textContent = percent(city.traffic);
+      ui.citySignals.textContent = `Economy ${city.economy.toFixed(0)} - Demand ${city.demand.toFixed(0)} - Estate ${city.estate.toFixed(0)}`;
+      ui.demandMetric.textContent = city.demand.toFixed(0);
+      ui.estateMetric.textContent = city.estate.toFixed(0);
+      ui.economyMetric.textContent = city.economy.toFixed(0);
+      ui.dateMetric.textContent = `${CITY_MONTHS[city.month]} ${city.year}`;
+      ui.sessionPill.innerHTML = `<span class="dot"></span> Metrovale Online - ${Object.keys(city.players).length} live player${Object.keys(city.players).length === 1 ? "" : "s"}`;
+    }
+
+    function render() {
+      if (!player || !city) return;
+      renderHeader();
+      renderBusinessStats();
+      renderProperties();
+      renderEmployees();
+      renderStocks();
+      renderLeaderboard();
+      renderNews();
+      createCityDistricts();
+    }
+
+    function bindButtons() {
+      document.getElementById("hireBtn").addEventListener("click", hireStaff);
+      document.getElementById("trainBtn").addEventListener("click", trainStaff);
+      document.getElementById("marketBtn").addEventListener("click", runMarketing);
+      document.getElementById("upgradeBtn").addEventListener("click", upgradeHQ);
+      document.getElementById("expandBtn").addEventListener("click", openBranch);
+    }
+
+    function hydratePlayer() {
+      city = loadCity();
+      const savedPlayer = loadPlayer();
+      if (savedPlayer) {
+        player = savedPlayer;
+        city.players[player.id] = publicPlayerState(player);
+        saveCity();
+        document.getElementById("setup").style.display = "none";
+      }
+    }
+
+    function initChannel() {
+      if (!("BroadcastChannel" in window)) return;
+      channel = new BroadcastChannel(CHANNEL);
+      channel.onmessage = event => {
+        if (event.data.type === "city-sync") {
+          city = event.data.city;
+          render();
         }
+      };
+    }
+
+    function startLoop() {
+      setInterval(() => {
+        maybeAdvanceCity();
+        if (player) {
+          playerTick();
+          render();
+        }
+      }, TICK_MS);
+      requestAnimationFrame(ts => {
+        lastRender = ts;
+        updateCars(ts);
+      });
+    }
+
+    function initSetup() {
+      populateTypeGrid();
+      document.getElementById("startBtn").addEventListener("click", () => {
+        const playerName = document.getElementById("playerName").value.trim() || "Player One";
+        const companyName = document.getElementById("companyName").value.trim() || `${businessTypes[selectedType].name.split(" ")[0]} Collective`;
+        player = createPlayer(playerName, companyName, selectedType);
+        city = loadCity();
+        city.players[player.id] = publicPlayerState(player);
+        savePlayer();
+        document.getElementById("setup").style.display = "none";
+        render();
+      });
+    }
+
+    function init() {
+      setupUiRefs();
+      bindButtons();
+      initSetup();
+      initChannel();
+      hydratePlayer();
+      city = loadCity();
+      if (player) {
+        render();
+      }
+      startLoop();
+    }
+
+    window.addEventListener("storage", event => {
+      if (event.key === STORAGE_KEY) {
+        city = loadCity();
+        render();
+      }
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('input-name').focus();
+    window.addEventListener("beforeunload", () => {
+      if (!player || !city) return;
+      city = loadCity();
+      delete city.players[player.id];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(city));
     });
-</script>
+
+    init();
+  </script>
 </body>
 </html>
-```
